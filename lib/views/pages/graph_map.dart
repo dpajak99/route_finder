@@ -39,6 +39,10 @@ class GraphMap extends StatelessWidget {
                   markerTapBehavior: MarkerTapBehavior.custom((Marker marker, PopupState popupState, PopupController popupController) {
                     StopMarker stopMarker = marker as StopMarker;
                     graphMapCubit.addVertex(stopMarker.stopVertex);
+                    // List<VehicleEdge> edgesFromVertex = state.directedGraph[stopMarker.stopVertex]!;
+                    // for (VehicleEdge edge in edgesFromVertex) {
+                    //   print('edge: $edge');
+                    // }
                   }),
                   popupBuilder: (BuildContext context, Marker marker) => Container(
                     color: Colors.white,
