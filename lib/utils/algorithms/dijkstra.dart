@@ -8,7 +8,9 @@ class Dijkstra {
   List<VehicleEdge> singleSourceShortestPaths(DirectedGraph directedGraph, StopVertex startVertex, StopVertex endVertex) {
     // Priority queue to select the next vertex to visit
     // based on the distance from the start vertex
-    PriorityQueue<VehicleEdge> queue = PriorityQueue<VehicleEdge>();
+    PriorityQueue<StopVertex> queue = PriorityQueue<StopVertex>();
+
+    queue.add(startVertex, 0);
 
     // Map to store the previous vertex for each vertex
     // in the shortest path from the start vertex
@@ -22,37 +24,37 @@ class Dijkstra {
     // distances[startVertex] = 0;
     times[startVertex] = 0;
 
-    // Add all the edges starting from the start vertex to the queue
-    for (VehicleEdge edge in directedGraph.values) {
-      queue.add(edge, edge.timeFromNow.toDouble());
-    }
-
     while (queue.isEmpty == false) {
       // Select the next vertex to visit based on the distance from the start vertex
-      VehicleEdge edge = queue.pop().value;
+      StopVertex currentVertex = queue.pop().value;
 
-      // If the selected vertex has not been visited yet
-      double previousTime = times[edge.fromVertex] ?? 0;
+      double currentTotalTime = times[currentVertex] ?? 0;
 
-      double currentTime = edge.timeToNextStop.toDouble();
-
-      double totalCurrentTime = previousTime + currentTime;
-      
-      double nextCurrentTime = times[edge.toVertex] ?? double.infinity;
-
-      bool firstVisit = times[edge.toVertex] == null;
-      
-      if ((firstVisit || nextCurrentTime > totalCurrentTime) && previousTime <= totalCurrentTime) {
+      List<VehicleEdge> neighbors = directedGraph[currentVertex] ?? List<VehicleEdge>.empty();
+      for (VehicleEdge edge in neighbors) {
+        StopVertex neighborVertex = edge.toVertex;
         
-        // Update the distance from the start vertex for the selected vertex
-        times[edge.toVertex] = totalCurrentTime;
-        times[edge.toVertex] = previousTime + edge.timeToNextStop;
-
-        // Update the previous vertex for the selected vertex
-        previous[edge.toVertex] = edge;
+        double timeToReachNeighbor = edge.timeFromNow.toDouble() - currentTotalTime;
+        if( currentTotalTime != 0 && timeToReachNeighbor <= 0 ) {
+          continue;
+        } else if( currentTotalTime == 0 ) {
+          currentTotalTime *= -1;
+        }
+        double totalTimeToReachNeighbor = currentTotalTime + timeToReachNeighbor;
+        double previousTotalTimeWithNeighbor = times[neighborVertex] ?? double.infinity;
+        bool hasBetterTime = totalTimeToReachNeighbor < previousTotalTimeWithNeighbor;
+        bool firstNeighborVisit = times[neighborVertex] == null;
+        
+        if (firstNeighborVisit || hasBetterTime) {
+          // Update the distance from the start vertex for the selected vertex
+          times[neighborVertex] = totalTimeToReachNeighbor;
+          queue.add(neighborVertex, totalTimeToReachNeighbor);
+          // Update the previous vertex for the selected vertex
+          previous[neighborVertex] = edge;
+        }
       }
     }
-    
+
     if (times[endVertex] == null) {
       throw Exception('Cannot find path from ${startVertex.id} to ${endVertex.id}');
     }
@@ -62,13 +64,11 @@ class Dijkstra {
 
     // Start from the end vertex and follow the previous pointers
     // back to the start vertex, adding each visited vertex to the list
-    VehicleEdge? currentEdge;
+
     StopVertex currentVertex = endVertex;
     while (currentVertex != startVertex) {
-      if (currentEdge != null) {
-        path.add(currentEdge);
-      }
-      currentEdge = previous[currentVertex]!;
+      VehicleEdge? currentEdge = previous[currentVertex]!;
+      path.add(currentEdge);
       currentVertex = currentEdge.fromVertex;
     }
 
