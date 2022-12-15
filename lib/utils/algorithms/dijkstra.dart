@@ -1,11 +1,11 @@
-import 'package:equatable/equatable.dart';
-import 'package:path_finder/utils/models/directed_graph.dart';
-import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
+import 'package:path_finder/utils/models/edge/transit_edge.dart';
+import 'package:path_finder/utils/models/edge/walk_edge.dart';
 import 'package:path_finder/utils/models/priority_queue.dart';
+import 'package:path_finder/utils/models/stops_graph.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class Dijkstra {
-  List<VehicleEdge> singleSourceShortestPaths(DirectedGraph directedGraph, StopVertex startVertex, StopVertex endVertex) {
+  List<TransitEdge> singleSourceShortestPaths(StopsGraph stopsGraph, StopVertex startVertex, StopVertex endVertex) {
     // Priority queue to select the next vertex to visit
     // based on the distance from the start vertex
     PriorityQueue<StopVertex> queue = PriorityQueue<StopVertex>();
@@ -14,7 +14,7 @@ class Dijkstra {
 
     // Map to store the previous vertex for each vertex
     // in the shortest path from the start vertex
-    Map<StopVertex, VehicleEdge> previous = <StopVertex, VehicleEdge>{};
+    Map<StopVertex, TransitEdge> previous = <StopVertex, TransitEdge>{};
 
     // Map to store the distance from the start vertex for each vertex
     // Map<StopVertex, double> distances = <StopVertex, double>{};
@@ -27,14 +27,19 @@ class Dijkstra {
     while (queue.isEmpty == false) {
       // Select the next vertex to visit based on the distance from the start vertex
       StopVertex currentVertex = queue.pop().value;
+      TransitEdge? previousEdge = previous[currentVertex];
 
       double currentTotalTime = times[currentVertex] ?? 0;
 
-      List<VehicleEdge> neighbors = directedGraph[currentVertex] ?? List<VehicleEdge>.empty();
-      for (VehicleEdge edge in neighbors) {
-        StopVertex neighborVertex = edge.toVertex;
+      List<TransitEdge> neighbors = stopsGraph[currentVertex] ?? List<TransitEdge>.empty();
+      for (TransitEdge edge in neighbors) {
+        StopVertex neighborVertex = edge.targetVertex;
         
-        double timeToReachNeighbor = edge.timeFromNow.toDouble() - currentTotalTime;
+        double timeToReachNeighbor = edge.calcCostToReachNeighbor(currentTotalTime);
+        bool secondWalkEdge = previousEdge is WalkEdge && edge is WalkEdge;
+        if(secondWalkEdge) {
+          continue;
+        }
         if( currentTotalTime != 0 && timeToReachNeighbor <= 0 ) {
           continue;
         } else if( currentTotalTime == 0 ) {
@@ -60,21 +65,21 @@ class Dijkstra {
     }
 
     // List to store the vertices in the shortest path
-    List<VehicleEdge> path = <VehicleEdge>[];
+    List<TransitEdge> path = <TransitEdge>[];
 
     // Start from the end vertex and follow the previous pointers
     // back to the start vertex, adding each visited vertex to the list
 
     StopVertex currentVertex = endVertex;
     while (currentVertex != startVertex) {
-      VehicleEdge? currentEdge = previous[currentVertex]!;
+      TransitEdge? currentEdge = previous[currentVertex]!;
       path.add(currentEdge);
-      currentVertex = currentEdge.fromVertex;
+      currentVertex = currentEdge.sourceVertex;
     }
 
     // Add the start vertex to the beginning of the list
     // path.insert(0, start);
-    for (VehicleEdge edge in path.reversed) {
+    for (TransitEdge edge in path.reversed) {
       print(edge);
     }
     // Return the list of vertices in the shortest path

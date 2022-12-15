@@ -1,29 +1,28 @@
 import 'package:path_finder/utils/models/edge/edge.dart';
-import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
 import 'package:path_finder/utils/models/vertex/vertex.dart';
 
-class DirectedGraph {
-  final Map<Vertex, List<VehicleEdge>> adjacencyList = <Vertex, List<VehicleEdge>>{};
+class DirectedGraph<V extends Vertex, E extends Edge<V>> {
+  final Map<V, List<E>> adjacencyList = <V, List<E>>{};
 
-  void addVertex(Vertex vertex) {
-    adjacencyList[vertex] = <VehicleEdge>[];
+  void addVertex(V vertex) {
+    adjacencyList[vertex] = <E>[];
   }
 
-  void addVertexIterable(Iterable<Vertex> vertices) {
+  void addVertexIterable(Iterable<V> vertices) {
     vertices.forEach(addVertex);
   }
 
-  void addEdge(VehicleEdge vehicleEdge) {
-    adjacencyList[vehicleEdge.fromVertex]!.add(vehicleEdge);
+  void addEdge(E vehicleEdge) {
+    adjacencyList[vehicleEdge.sourceVertex]!.add(vehicleEdge);
   }
 
-  void addEdgeIterable(Iterable<VehicleEdge> vehicleEdges) {
+  void addEdgeIterable(Iterable<E> vehicleEdges) {
     vehicleEdges.forEach(addEdge);
   }
 
-  List<VehicleEdge>? operator [](Vertex vertex) => adjacencyList[vertex];
+  List<E>? operator [](V vertex) => adjacencyList[vertex];
 
-  List<Vertex> get keys => adjacencyList.keys.toList();
+  List<V> get keys => adjacencyList.keys.toList();
 
-  List<VehicleEdge> get values => adjacencyList.values.toList().reduce((List<VehicleEdge> value, List<VehicleEdge> element) => value + element);
+  List<E> get values => adjacencyList.values.toList().reduce((List<E> value, List<E> element) => value + element);
 }

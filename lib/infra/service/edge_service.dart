@@ -8,16 +8,18 @@ class EdgeService {
   final StopService stopService = StopService();
   final EdgeRepository edgeRepository = EdgeRepository();
 
-  Future<List<VehicleEdge>> getEdgesList(List<StopVertex> vertexList) async {
-    List<VehicleEdgeDto> edgesEntityList = await edgeRepository.getAllVehicleEdges();
+  Future<List<VehicleEdge>> getEdgesList(List<StopVertex> vertexList, DateTime dateTime) async {
+    int minutes = 60 * dateTime.hour + dateTime.minute;
+    List<VehicleEdgeDto> edgesEntityList = await edgeRepository.getAllVehicleEdges(minutes);
     List<VehicleEdge> vehicleEdgeModelList = List<VehicleEdge>.empty(growable: true);
     for (VehicleEdgeDto vehicleEdgeDto in edgesEntityList) {
       StopVertex fromStopVertex = vertexList.where((StopVertex e) => e.id == vehicleEdgeDto.from.toString()).first;
       StopVertex toStopVertex = vertexList.where((StopVertex e) => e.id == vehicleEdgeDto.to.toString()).first;
       vehicleEdgeModelList.add(VehicleEdge(
-        fromVertex: fromStopVertex,
-        toVertex: toStopVertex,
+        sourceVertex: fromStopVertex,
+        targetVertex: toStopVertex,
         trackId: vehicleEdgeDto.trackId,
+        timeInMin: vehicleEdgeDto.timeInMin,
         timeFromNow: vehicleEdgeDto.timeFromNow,
         timeToNextStop: vehicleEdgeDto.timeToNextStop,
       ));

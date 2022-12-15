@@ -4,6 +4,7 @@ class VehicleEdgeDto extends Equatable {
   final int from;
   final int to;
   final String trackId;
+  final int timeInMin;
   final int timeFromNow;
   final int timeToNextStop;
   
@@ -11,6 +12,7 @@ class VehicleEdgeDto extends Equatable {
     required this.from,
     required this.to,
     required this.trackId,
+    required this.timeInMin,
     required this.timeFromNow,
     required this.timeToNextStop,
   });
@@ -20,6 +22,7 @@ class VehicleEdgeDto extends Equatable {
       from: json['from'] as int,
       to: json['to'] as int,
       trackId: json['track_id'] as String,
+      timeInMin: json['time_in_min'] as int,
       timeFromNow: json['time_from_now'] as int,
       timeToNextStop: json['time_to_next_stop_in_min'] as int,
     );

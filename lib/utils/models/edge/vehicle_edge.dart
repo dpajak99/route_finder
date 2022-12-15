@@ -1,26 +1,35 @@
 import 'dart:math';
 
 import 'package:path_finder/utils/models/edge/edge.dart';
+import 'package:path_finder/utils/models/edge/transit_edge.dart';
+import 'package:path_finder/utils/models/vertex/geo_vertex.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
-class VehicleEdge extends Edge {
-  static const int currentTimeMock = 840;
-  final StopVertex fromVertex;
-  final StopVertex toVertex;
+class VehicleEdge extends TransitEdge {
   final String trackId;
+  final int timeInMin;
   final int timeFromNow;
   final int timeToNextStop;
   
   const VehicleEdge({
-    required this.fromVertex,
-    required this.toVertex,
+    required StopVertex sourceVertex,
+    required StopVertex targetVertex,
     required this.trackId,
+    required this.timeInMin,
     required this.timeFromNow,
     required this.timeToNextStop,
-  }) : super();
+  }) : super(
+    sourceVertex: sourceVertex,
+    targetVertex: targetVertex,
+  );
+  
+  @override
+  double calcCostToReachNeighbor(double currentTotalTime) {
+    return timeFromNow.toDouble() - currentTotalTime;
+  }
   
   double calcCost() {
-    return euclideanDistance(fromVertex) + timeToNextStop;
+    return euclideanDistance(sourceVertex) + timeToNextStop;
   }
   
   double calcFromStart(StopVertex stopVertex) {
@@ -28,11 +37,11 @@ class VehicleEdge extends Edge {
   }
   
   double euclideanDistance(StopVertex from) {
-    return sqrt(pow(from.lat - toVertex.lat, 2) + pow(from.long - toVertex.long, 2));
+    return sqrt(pow(from.lat - targetVertex.lat, 2) + pow(from.long - targetVertex.long, 2));
   }
   
   String getTimeAsString() {
-    int fullTimeMinutes = currentTimeMock + timeFromNow;
+    int fullTimeMinutes = timeInMin;
     int hours = fullTimeMinutes ~/ 60;
     int minutes = fullTimeMinutes % 60;
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
@@ -45,10 +54,10 @@ class VehicleEdge extends Edge {
   }
   
   @override
-  List<Object?> get props => <Object?>[fromVertex, toVertex, trackId, timeFromNow, timeToNextStop];
+  List<Object?> get props => <Object?>[sourceVertex, targetVertex, trackId, timeFromNow, timeToNextStop];
   
   @override
   String toString() {
-    return 'From: ${fromVertex.name}, To: ${toVertex.name}, Time: ${getTimeAsString()}, Time from now: ${getTimeFromNowAsString()} Track: $trackId';
+    return 'BUS: From: ${sourceVertex.name}, To: ${targetVertex.name}, Time: ${getTimeAsString()}, Time from now: ${getTimeFromNowAsString()} Track: $trackId';
   }
 }
