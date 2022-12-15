@@ -19,7 +19,7 @@ class EdgeService {
         sourceVertex: fromStopVertex,
         targetVertex: toStopVertex,
         trackId: vehicleEdgeDto.trackId,
-        timeInMin: vehicleEdgeDto.timeInMin,
+        departureTime: vehicleEdgeDto.timeInMin,
         timeFromNow: vehicleEdgeDto.timeFromNow,
         timeToNextStop: vehicleEdgeDto.timeToNextStop,
       ));

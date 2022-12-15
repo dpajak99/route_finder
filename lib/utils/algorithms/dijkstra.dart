@@ -1,16 +1,21 @@
+import 'dart:math';
+
+import 'package:path_finder/utils/models/cost_config.dart';
+import 'package:path_finder/utils/models/cost_table.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
-import 'package:path_finder/utils/models/edge/walk_edge.dart';
 import 'package:path_finder/utils/models/priority_queue.dart';
 import 'package:path_finder/utils/models/stops_graph.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class Dijkstra {
   List<TransitEdge> singleSourceShortestPaths(StopsGraph stopsGraph, StopVertex startVertex, StopVertex endVertex) {
+    CostConfig costConfig = CostConfig();
+    
     // Priority queue to select the next vertex to visit
     // based on the distance from the start vertex
-    PriorityQueue<StopVertex> queue = PriorityQueue<StopVertex>();
+    PriorityQueue<StopVertex> unvisitedStopsQueue = PriorityQueue<StopVertex>();
 
-    queue.add(startVertex, 0);
+    unvisitedStopsQueue.add(startVertex, 0);
 
     // Map to store the previous vertex for each vertex
     // in the shortest path from the start vertex
@@ -19,48 +24,54 @@ class Dijkstra {
     // Map to store the distance from the start vertex for each vertex
     // Map<StopVertex, double> distances = <StopVertex, double>{};
     Map<StopVertex, double> times = <StopVertex, double>{};
+    Map<StopVertex, double> costs = <StopVertex, double>{};
 
     // Set the initial distance for the start vertex to 0
-    // distances[startVertex] = 0;
     times[startVertex] = 0;
+    costs[startVertex] = 0;
 
-    while (queue.isEmpty == false) {
+    while (unvisitedStopsQueue.isEmpty == false) {
       // Select the next vertex to visit based on the distance from the start vertex
-      StopVertex currentVertex = queue.pop().value;
-      TransitEdge? previousEdge = previous[currentVertex];
+      StopVertex currentStopVertex = unvisitedStopsQueue.pop().value;
+      TransitEdge? previousTransitEdge = previous[currentStopVertex];
 
-      double currentTotalTime = times[currentVertex] ?? 0;
+      double currentTotalTime = times[currentStopVertex] ?? 0;
+      double currentTotalCost = costs[currentStopVertex] ?? 0;
 
-      List<TransitEdge> neighbors = stopsGraph[currentVertex] ?? List<TransitEdge>.empty();
-      for (TransitEdge edge in neighbors) {
-        StopVertex neighborVertex = edge.targetVertex;
-        
-        double timeToReachNeighbor = edge.calcCostToReachNeighbor(currentTotalTime);
-        bool secondWalkEdge = previousEdge is WalkEdge && edge is WalkEdge;
-        if(secondWalkEdge) {
+      List<TransitEdge> neighbors = stopsGraph[currentStopVertex] ?? List<TransitEdge>.empty();
+      for (TransitEdge neighborEdge in neighbors) {
+        bool isTransitAvailable = neighborEdge.isTransitAvailable(previousTransitEdge, currentTotalTime);
+        if(isTransitAvailable == false) {
           continue;
         }
-        if( currentTotalTime != 0 && timeToReachNeighbor <= 0 ) {
-          continue;
-        } else if( currentTotalTime == 0 ) {
-          currentTotalTime *= -1;
-        }
-        double totalTimeToReachNeighbor = currentTotalTime + timeToReachNeighbor;
-        double previousTotalTimeWithNeighbor = times[neighborVertex] ?? double.infinity;
-        bool hasBetterTime = totalTimeToReachNeighbor < previousTotalTimeWithNeighbor;
-        bool firstNeighborVisit = times[neighborVertex] == null;
+        StopVertex neighborVertex = neighborEdge.targetVertex;
+
+        CostTable costTable = neighborEdge.getCostTable(previousTransitEdge, currentTotalTime);
         
-        if (firstNeighborVisit || hasBetterTime) {
+        double transferTime = neighborEdge.distanceTime;
+        double transitCost = costTable.calcCost(costConfig);
+        
+        double totalTimeToReachNeighbor = currentTotalTime + transferTime;
+        double totalCostToReachNeighbor = currentTotalCost + transitCost;
+        
+        double previousTotalCostWithNeighbor = costs[neighborVertex] ?? double.infinity;
+        
+        bool hasBetterCost = totalCostToReachNeighbor < previousTotalCostWithNeighbor;
+        bool firstNeighborVisit = costs[neighborVertex] == null;
+        
+        if (firstNeighborVisit || hasBetterCost) {
           // Update the distance from the start vertex for the selected vertex
           times[neighborVertex] = totalTimeToReachNeighbor;
-          queue.add(neighborVertex, totalTimeToReachNeighbor);
+          costs[neighborVertex] = totalCostToReachNeighbor;
+          
+          unvisitedStopsQueue.add(neighborVertex, totalCostToReachNeighbor);
           // Update the previous vertex for the selected vertex
-          previous[neighborVertex] = edge;
+          previous[neighborVertex] = neighborEdge;
         }
       }
     }
 
-    if (times[endVertex] == null) {
+    if (costs[endVertex] == null) {
       throw Exception('Cannot find path from ${startVertex.id} to ${endVertex.id}');
     }
 
