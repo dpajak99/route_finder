@@ -1,6 +1,5 @@
 import 'package:path_finder/utils/models/cost_table.dart';
 import 'package:path_finder/utils/models/edge/edge.dart';
-import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 abstract class TransitEdge extends Edge<StopVertex>{
@@ -13,6 +12,8 @@ abstract class TransitEdge extends Edge<StopVertex>{
   );
   
   double get distanceTime;
+  int get departureTime;
+  int get arrivalTime;
   
   CostTable getCostTable(TransitEdge? previousEdge, double currentTotalTime);
   

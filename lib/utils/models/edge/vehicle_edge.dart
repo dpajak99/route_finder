@@ -9,7 +9,7 @@ import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class VehicleEdge extends TransitEdge {
   final String trackId;
-  final int departureTime;
+  final int _departureTime;
   final int timeFromNow;
   final int timeToNextStop;
   final double distance;
@@ -18,15 +18,24 @@ class VehicleEdge extends TransitEdge {
     required StopVertex sourceVertex,
     required StopVertex targetVertex,
     required this.trackId,
-    required this.departureTime,
+    required int departureTime,
     required this.timeFromNow,
     required this.timeToNextStop,
   })  : distance = Haversine.calcDistanceInMeters(sourceVertex, targetVertex),
+        _departureTime = departureTime,
         super(
           sourceVertex: sourceVertex,
           targetVertex: targetVertex,
         );
 
+  @override
+  int get departureTime => _departureTime;
+  
+  @override
+  int get arrivalTime => departureTime + timeToNextStop;
+  
+  
+  
   @override
   double get distanceTime => timeToNextStop.toDouble();
 

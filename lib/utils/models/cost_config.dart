@@ -1,7 +1,7 @@
 import 'dart:math';
 
 class CostConfig {
-  final double _walkingTransferPenalty = 10;
+  final double _walkingTransferPenalty = 50;
   final double vehicleTransferPenalty = 10;
 
   final double transferTimeWeight = 1;

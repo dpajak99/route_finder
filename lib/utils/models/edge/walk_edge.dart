@@ -24,6 +24,12 @@ class WalkEdge extends TransitEdge {
   double get distanceTime => _transferTime;
 
   @override
+  int get arrivalTime => 0;
+
+  @override
+  int get departureTime => 0;
+
+  @override
   CostTable getCostTable(TransitEdge? previousEdge, double currentTotalTime) {
     return WalkCostTable(distanceToWalk: distanceToWalk, walkingTime: _transferTime);
   }

@@ -23,7 +23,7 @@ class WalkCostTable extends CostTable {
   double calcCost(CostConfig costConfig) {
     double distancePenalty = costConfig.calcWalkingDistancePenalty(distanceToWalk);
     double walkingTimePenalty = walkingTime * costConfig.transferTimeWeight;
-    return distancePenalty + walkingTimePenalty + costConfig.transferTimeWeight;
+    return distancePenalty + walkingTimePenalty;
   }
 }
 

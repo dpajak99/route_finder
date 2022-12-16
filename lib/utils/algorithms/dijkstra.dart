@@ -2,7 +2,10 @@ import 'dart:math';
 
 import 'package:path_finder/utils/models/cost_config.dart';
 import 'package:path_finder/utils/models/cost_table.dart';
+import 'package:path_finder/utils/models/edge/parsed_walk_edge.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
+import 'package:path_finder/utils/models/edge/walk_edge.dart';
+import 'package:path_finder/utils/models/pathfinder_result.dart';
 import 'package:path_finder/utils/models/priority_queue.dart';
 import 'package:path_finder/utils/models/stops_graph.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
@@ -66,7 +69,11 @@ class Dijkstra {
           
           unvisitedStopsQueue.add(neighborVertex, totalCostToReachNeighbor);
           // Update the previous vertex for the selected vertex
-          previous[neighborVertex] = neighborEdge;
+          if( neighborEdge is WalkEdge ) {
+            previous[neighborVertex] = ParsedWalkEdge.fromWalkEdge(neighborEdge, currentTotalTime.toInt());
+          } else {
+            previous[neighborVertex] = neighborEdge;
+          }
         }
       }
     }
@@ -90,9 +97,8 @@ class Dijkstra {
 
     // Add the start vertex to the beginning of the list
     // path.insert(0, start);
-    for (TransitEdge edge in path.reversed) {
-      print(edge);
-    }
+    PathFinderResult result = PathFinderResult.fromEdges(path.reversed.toList());
+    result.printRoute();
     // Return the list of vertices in the shortest path
     return path;
   }
