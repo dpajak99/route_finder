@@ -7,7 +7,6 @@ void main() {
   StopVertex source = const StopVertex(id: '808', lat: 50.06298, long: 21.13722, name: 'Jodłówka - Wałki - Las 11');
   StopVertex target = const StopVertex(id: '807', lat: 50.06349, long: 21.1368, name: 'Jodłówka - Wałki - Las 36');
 
-  print(calcDistanceInMeters(source, target));
 }
 
 double calcDistanceInMeters(StopVertex sourceVertex, StopVertex targetVertex) {

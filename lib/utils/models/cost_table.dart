@@ -5,47 +5,47 @@ abstract class CostTable extends Equatable {
   const CostTable();
 
   double calcCost(CostConfig costConfig);
-  
+
   @override
   List<Object?> get props => <Object?>[];
 }
 
 class WalkCostTable extends CostTable {
   final double distanceToWalk;
-  final double walkingTime;
+  final int walkingTime;
 
   const WalkCostTable({
     required this.distanceToWalk,
     required this.walkingTime,
   });
-  
+
   @override
   double calcCost(CostConfig costConfig) {
-    double distancePenalty = costConfig.calcWalkingDistancePenalty(distanceToWalk);
-    double walkingTimePenalty = walkingTime * costConfig.transferTimeWeight;
-    return distancePenalty + walkingTimePenalty;
+    double walkingPenaltyValue = costConfig.calcWalkingDistancePenalty(distanceToWalk);
+    return (walkingTime + walkingPenaltyValue).toDouble();
   }
 }
 
 class RideCostTable extends CostTable {
-  final double distanceToRide;
-  final double transferTime;
-  final double waitingTime;
-  final bool transfer;
+  final double _distanceToRide;
+  final int _vehicleTime;
+  final int _waitingTime;
+  final bool _transfer;
 
   const RideCostTable({
-    required this.distanceToRide,
-    required this.transferTime,
-    required this.waitingTime,
-    required this.transfer,
-  });
-  
+    required double distanceToRide,
+    required int vehicleTime,
+    required int waitTime,
+    required bool transfer,
+  }) : _distanceToRide = distanceToRide,
+        _vehicleTime = vehicleTime,
+        _waitingTime = waitTime < 0 ? 0 : waitTime,
+        _transfer = transfer;
+
   @override
   double calcCost(CostConfig costConfig) {
-    double distancePenalty = distanceToRide * costConfig.distanceWeight;
-    double rideTimePenalty = transferTime * costConfig.transferTimeWeight;
-    double transferPenalty = transfer ? costConfig.vehicleTransferPenalty : 0;
-    
-    return distancePenalty + rideTimePenalty + transferPenalty;
+    double transitTime = _vehicleTime.toDouble() + _waitingTime.toDouble();
+    double transferPenaltyValue = _transfer ? costConfig.rideTableConfigModel.penaltyForTransfer : 0;
+    return transitTime + transferPenaltyValue;
   }
 }

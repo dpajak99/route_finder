@@ -4,6 +4,7 @@ import 'package:path_finder/utils/algorithms/haversine.dart';
 import 'package:path_finder/utils/models/cost_table.dart';
 import 'package:path_finder/utils/models/edge/edge.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
+import 'package:path_finder/utils/models/edge_result.dart';
 import 'package:path_finder/utils/models/vertex/geo_vertex.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
@@ -29,43 +30,38 @@ class VehicleEdge extends TransitEdge {
         );
 
   @override
-  int get departureTime => _departureTime;
-  
-  @override
-  int get arrivalTime => departureTime + timeToNextStop;
-  
-  
-  
-  @override
-  double get distanceTime => timeToNextStop.toDouble();
-
-  @override
-  CostTable getCostTable(TransitEdge? previousEdge, double currentTotalTime) {
-    double waitingTime = _calcWaitingTime(currentTotalTime);
+  CostTable buildCostTable(TransitEdge? previousEdge, int currentTotalTime) {
+    int waitTime = calcWaitingTime(currentTotalTime);
     return RideCostTable(
       distanceToRide: distance,
-      transferTime: waitingTime + distanceTime,
-      waitingTime: _calcWaitingTime(currentTotalTime),
+      vehicleTime: timeToNextStop,
+      waitTime: waitTime,
       transfer: previousEdge is VehicleEdge && trackId != previousEdge.trackId,
     );
   }
   
   @override
-  bool isTransitAvailable(TransitEdge? previousEdge, double currentTotalTime) {
-    double waitingTime = _calcWaitingTime(currentTotalTime);
-    if( currentTotalTime != 0 && waitingTime <= 0 ) {
-      return false;
-    }
-    return true;
+  FullEdgeTime calcFullEdgeTime(int currentTotalTime) {
+    int waitingTime = calcWaitingTime(currentTotalTime);
+    return FullEdgeTime( transitTime: timeToNextStop, waitingTime: waitingTime);
+    
   }
-
-  double _calcWaitingTime(double currentTotalTime) {
-    return timeFromNow.toDouble() - currentTotalTime;
+  
+  @override
+  bool isTransitAvailable(TransitEdgeResult? previousEdgeResult, int currentTotalTime) {
+    if(previousEdgeResult == null ) {
+      return true;
+    }
+    return previousEdgeResult.edgeTimeEnd <= timeFromNow;
+  }
+  
+  int calcWaitingTime(int currentTotalTime) {
+    return timeFromNow - currentTotalTime;
   }
 
   ////////////////////
-  double calcFromStart(StopVertex stopVertex) {
-    return euclideanDistance(stopVertex);
+  int calcFromStart(StopVertex stopVertex) {
+    return euclideanDistance(stopVertex).toInt();
   }
 
   double euclideanDistance(StopVertex from) {
@@ -73,7 +69,7 @@ class VehicleEdge extends TransitEdge {
   }
 
   String getTimeAsString() {
-    int fullTimeMinutes = departureTime;
+    int fullTimeMinutes = _departureTime;
     int hours = fullTimeMinutes ~/ 60;
     int minutes = fullTimeMinutes % 60;
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';

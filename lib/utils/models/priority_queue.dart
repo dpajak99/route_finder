@@ -25,6 +25,9 @@ class PriorityQueue<T> {
     queue
       ..add(element)
       ..sort((PriorityQueueElement<T> a, PriorityQueueElement<T> b) {
+        if( a.cost == double.infinity || b.cost == double.infinity) {
+          return 1;
+        }
         return (a.cost - b.cost).toInt();
       });
   }

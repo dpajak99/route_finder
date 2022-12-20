@@ -36,8 +36,11 @@ dependencies:
   flutter_map_marker_popup: ^4.0.0
   graphs: ^2.2.0
   postgres: ^2.5.2
+  math_parser: ^1.5.0
   flutter_bloc: ^8.1.1
-  intl: ^0.18.0
+  intl: ^0.17.0
+  syncfusion_flutter_charts: ^20.3.61
+  dropdown_button2: ^1.9.2
   flutter:
     sdk: flutter
 

@@ -1,47 +1,46 @@
-import 'dart:math';
-
 import 'package:path_finder/utils/models/cost_table.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
+import 'package:path_finder/utils/models/edge_result.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class WalkEdge extends TransitEdge {
-  static const double averageWalkingSpeedMeterPerMinute = 80;
+  static const int averageWalkingSpeedMeterPerMinute = 50;
   
   final double distanceToWalk;
-  final double _transferTime;
+  final int _fullTransitTime;
 
   const WalkEdge({
     required StopVertex sourceVertex,
     required StopVertex targetVertex,
     required this.distanceToWalk,
-  })  : _transferTime = distanceToWalk / averageWalkingSpeedMeterPerMinute,
+  })  : _fullTransitTime = distanceToWalk ~/ averageWalkingSpeedMeterPerMinute,
         super(
           sourceVertex: sourceVertex,
           targetVertex: targetVertex,
         );
 
   @override
-  double get distanceTime => _transferTime;
+  FullEdgeTime calcFullEdgeTime(int currentTotalTime) {
+    return FullEdgeTime( waitingTime: 0, transitTime: _fullTransitTime);
+  }
 
   @override
-  int get arrivalTime => 0;
-
-  @override
-  int get departureTime => 0;
-
-  @override
-  CostTable getCostTable(TransitEdge? previousEdge, double currentTotalTime) {
-    return WalkCostTable(distanceToWalk: distanceToWalk, walkingTime: _transferTime);
+  CostTable buildCostTable(TransitEdge? previousEdge, int currentTotalTime) {
+    return WalkCostTable(distanceToWalk: distanceToWalk, walkingTime: _fullTransitTime);
   }
   
   @override
-  bool isTransitAvailable(TransitEdge? previousEdge, double currentTotalTime) {
-    bool nextWalkEdgeInLine = previousEdge is WalkEdge;
-    return nextWalkEdgeInLine == false;
+  bool isTransitAvailable(TransitEdgeResult? previousEdgeResult, int currentTotalTime) {
+    if( previousEdgeResult == null ) {
+      return true;
+    }
+    bool nextWalkEdgeInLine = previousEdgeResult.transitEdge is WalkEdge;
+    return nextWalkEdgeInLine == false && previousEdgeResult.edgeTimeEnd <= currentTotalTime;
   }
+  
   
   @override
   String toString() {
-    return 'WALK: ${sourceVertex.name} -> ${targetVertex.name} (${distanceToWalk.toStringAsFixed(2)}m) ${distanceTime.toStringAsFixed(2)}min';
+    return 'WALK: ${sourceVertex.name} -> ${targetVertex.name} (${distanceToWalk.toStringAsFixed(2)}m) ${_fullTransitTime.toStringAsFixed(2)}min';
   }
 }

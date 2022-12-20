@@ -66,7 +66,6 @@
 //
 //     // Add the start vertex to the beginning of the list
 //     path.insert(0, start);
-//     print(path);
 //     // Return the list of vertices in the shortest path
 //     return path;
 //   }

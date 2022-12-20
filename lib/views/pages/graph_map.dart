@@ -5,20 +5,15 @@ import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:path_finder/bloc/graph_map_cubit/graph_map_cubit.dart';
 import 'package:path_finder/bloc/graph_map_cubit/graph_map_state.dart';
-import 'package:path_finder/bloc/stop_select_cubit/stop_select_cubit.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/edge/walk_edge.dart';
 import 'package:path_finder/utils/models/markers/stop_marker.dart';
-import 'package:path_finder/utils/models/vertex/geo_vertex.dart';
-import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class GraphMap extends StatelessWidget {
-  final StopSelectCubit stopSelectCubit;
   final GraphMapCubit graphMapCubit;
 
   const GraphMap({
     required this.graphMapCubit,
-    required this.stopSelectCubit,
     super.key,
   });
 
@@ -55,7 +50,7 @@ class GraphMap extends StatelessWidget {
                 options: PopupMarkerLayerOptions(
                   markerTapBehavior: MarkerTapBehavior.custom((Marker marker, PopupState popupState, PopupController popupController) {
                     StopMarker stopMarker = marker as StopMarker;
-                    stopSelectCubit.updateSelectedVertex(stopMarker.stopVertex);
+                    graphMapCubit.stopSelectCubit.updateSelectedVertex(stopMarker.stopVertex);
                   }),
                   popupBuilder: (BuildContext context, Marker marker) => Container(
                     color: Colors.white,
