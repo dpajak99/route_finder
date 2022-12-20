@@ -40,8 +40,8 @@ class GraphMap extends StatelessWidget {
                       LatLng(e.sourceVertex.lat, e.sourceVertex.long),
                       LatLng(e.targetVertex.lat, e.targetVertex.long),
                     ],
-                    strokeWidth: 2.0,
-                    color: Colors.blue,
+                    strokeWidth: 5.0,
+                    color: e is WalkEdge ? Colors.red : Colors.blue,
                     isDotted: e is WalkEdge,
                   );
                 }).toList(),

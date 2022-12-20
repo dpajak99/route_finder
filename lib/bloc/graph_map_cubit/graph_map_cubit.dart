@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_finder/bloc/graph_map_cubit/graph_map_state.dart';
 import 'package:path_finder/bloc/stop_select_cubit/stop_select_cubit.dart';
@@ -8,6 +7,7 @@ import 'package:path_finder/utils/algorithms/dijkstra.dart';
 import 'package:path_finder/utils/models/cost_config.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
+import 'package:path_finder/utils/models/edge_result.dart';
 import 'package:path_finder/utils/models/markers/stop_marker.dart';
 import 'package:path_finder/utils/models/markers/transit_stop_marker.dart';
 import 'package:path_finder/utils/models/stops_graph.dart';
@@ -48,16 +48,25 @@ class GraphMapCubit extends Cubit<GraphMapState> {
     DateTime dateTime = stopSelectCubit.state.dateTime;
     int minutes = 60 * dateTime.hour + dateTime.minute;
     
-    List<TransitEdge> path = dijkstra.singleSourceShortestPaths(stopsGraph, stopSelectCubit.state.sourceVertex!, stopSelectCubit.state.targetVertex!, costConfig, minutes);
+    List<TransitEdgeResult> path = dijkstra.singleSourceShortestPaths(stopsGraph, stopSelectCubit.state.sourceVertex!, stopSelectCubit.state.targetVertex!, costConfig, minutes);
     List<StopMarker> markers = List<StopMarker>.empty(growable: true);
     for (int i = 0; i < path.length; i++) {
-      TransitEdge edge = path[i];
+      TransitEdgeResult transitEdgeResult = path[i];
+      bool isLast = i == path.length - 1;
       markers.add(TransitStopMarker(
-        stopVertex: path[i].sourceVertex,
-        transitEdge: edge,
+        stopVertex: transitEdgeResult.transitEdge.sourceVertex,
+        transitEdgeResult: transitEdgeResult,
+        isLast: false,
       ));
+      if( isLast ) {
+        markers.add(TransitStopMarker(
+          stopVertex: transitEdgeResult.transitEdge.targetVertex,
+          transitEdgeResult: transitEdgeResult,
+          isLast: true,
+        ));
+      }
     }
 
-    emit(GraphMapSearchState(markers: markers, edges: path));
+    emit(GraphMapSearchState(markers: markers, edges: path.map((TransitEdgeResult e) => e.transitEdge).toList()));
   }
 }

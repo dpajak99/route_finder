@@ -7,7 +7,7 @@ import 'package:path_finder/utils/models/stops_graph.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class Dijkstra {
-  List<TransitEdge> singleSourceShortestPaths(
+  List<TransitEdgeResult> singleSourceShortestPaths(
       StopsGraph stopsGraph, StopVertex startVertex, StopVertex endVertex, CostConfig costConfig, int currentTimeInMin) {
     // Priority queue to select the next vertex to visit
     // based on the distance from the start vertex
@@ -60,6 +60,7 @@ class Dijkstra {
         if (firstNeighborVisit || hasBetterCost) {
           // Update the previous vertex for the selected vertex
           previous[neighborVertex] = TransitEdgeResult(
+            currentTime: currentTimeInMin,
             transitEdge: neighborEdge,
             totalCost: costFromStartToReachNeighbor,
             totalTime: timeFromStartToReachNeighbor,
@@ -106,6 +107,6 @@ class Dijkstra {
     // PathFinderResult result = PathFinderResult.fromEdges(path.reversed.toList());
     // result.printRoute();
     // Return the list of vertices in the shortest path
-    return path.map((TransitEdgeResult e) => e.transitEdge).toList();
+    return path.reversed.toList();
   }
 }
