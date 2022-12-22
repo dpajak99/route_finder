@@ -1,30 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:math_parser/math_parser.dart';
-import 'package:path_finder/utils/models/global_table_config_model.dart';
-import 'package:path_finder/utils/models/walking_table_config_model.dart';
-import 'package:path_finder/views/pages/global_table_config_widget/global_table_config_controller.dart';
-import 'package:path_finder/views/pages/walking_table_config_widget/walking_table_config_controller.dart';
+import 'package:path_finder/config/locator.dart';
+import 'package:path_finder/listeners/edge_cost_config/edge_cost_config.dart';
+import 'package:path_finder/utils/models/edge_cost_table/walk_edge_cost_table.dart';
+import 'package:path_finder/views/widgets/edge_cost_table/walk_edge_cost_table_widget/walk_edge_cost_table_controller.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class GlobalTableConfigWidget extends StatefulWidget {
-  final GlobalTableController globalTableController;
-  final void Function() onChanged;
-
-  const GlobalTableConfigWidget({
-    required this.globalTableController,
-    required this.onChanged,
+class WalkEdgeCostTableWidget extends StatefulWidget {
+  const WalkEdgeCostTableWidget({
     Key? key,
   }) : super(key: key);
 
   @override
-  _GlobalTableConfigWidgetState createState() => _GlobalTableConfigWidgetState();
+  _WalkEdgeCostTableWidgetState createState() => _WalkEdgeCostTableWidgetState();
 }
 
-class _GlobalTableConfigWidgetState extends State<GlobalTableConfigWidget> {
-  @override
-  void initState() {
-    super.initState();
-  }
+class _WalkEdgeCostTableWidgetState extends State<WalkEdgeCostTableWidget> {
+  final WalkEdgeCostTableController walkEdgeCostTableController = WalkEdgeCostTableController();
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +28,22 @@ class _GlobalTableConfigWidgetState extends State<GlobalTableConfigWidget> {
             Row(
               children: <Widget>[
                 Expanded(
+                  flex: 2,
                   child: TextField(
-                    controller: widget.globalTableController.transitTimeWeightTextEditingController,
+                    controller: walkEdgeCostTableController.penaltyFunctionTextEditingController,
+                    onSubmitted: (String value) => walkEdgeCostTableController.penaltyFunction = value,
                     decoration: const InputDecoration(
-                      labelText: 'Waga czasu podróży',
+                      labelText: 'Funkcja kary f(x) gdzie x to dystans',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextField(
+                    controller: walkEdgeCostTableController.guaranteedPenaltyTextEditingController,
+                    onSubmitted: (String value) => walkEdgeCostTableController.guaranteedPenaltyForTransfer = double.parse(value),
+                    decoration: const InputDecoration(
+                      labelText: 'Gwarantowana kara (a)',
                     ),
                   ),
                 ),
@@ -49,10 +53,22 @@ class _GlobalTableConfigWidgetState extends State<GlobalTableConfigWidget> {
             Row(
               children: <Widget>[
                 Expanded(
+                  flex: 2,
                   child: TextField(
-                    controller: widget.globalTableController.distanceWeightTextEditingController,
+                    controller: walkEdgeCostTableController.speedTextEditingController,
+                    onSubmitted: (String value) => walkEdgeCostTableController.speed = int.parse(value),
                     decoration: const InputDecoration(
-                      labelText: 'Waga odległości',
+                      labelText: 'Średnia prędkość chodu (metrów/minuta)',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextField(
+                    controller: walkEdgeCostTableController.weightTextEditingController,
+                    onSubmitted: (String value) => walkEdgeCostTableController.weight = int.parse(value),
+                    decoration: const InputDecoration(
+                      labelText: 'Waga',
                     ),
                   ),
                 ),
@@ -61,16 +77,23 @@ class _GlobalTableConfigWidgetState extends State<GlobalTableConfigWidget> {
             const SizedBox(height: 16),
             Row(
               children: <Widget>[
+                ElevatedButton(
+                  onPressed: () {
+                    showDialog<void>(context: context, builder: (_) => ChartDialog(walkEdgeCostTableController: walkEdgeCostTableController));
+                  },
+                  child: const Icon(Icons.search),
+                ),
+                const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () => widget.globalTableController.resetValues(),
+                    onPressed: walkEdgeCostTableController.resetValues,
                     child: const Text('Resetuj'),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: widget.onChanged,
+                    onPressed: walkEdgeCostTableController.save,
                     child: const Text('Zastosuj'),
                   ),
                 ),
@@ -84,10 +107,10 @@ class _GlobalTableConfigWidgetState extends State<GlobalTableConfigWidget> {
 }
 
 class ChartDialog extends StatefulWidget {
-  final WalkingTableController walkingTableController;
+  final WalkEdgeCostTableController walkEdgeCostTableController;
 
   const ChartDialog({
-    required this.walkingTableController,
+    required this.walkEdgeCostTableController,
     Key? key,
   }) : super(key: key);
 
@@ -96,6 +119,8 @@ class ChartDialog extends StatefulWidget {
 }
 
 class _ChartDialogState extends State<ChartDialog> {
+  final EdgeCostConfig edgeCostConfig = getIt<EdgeCostConfig>();
+  
   List<LineSeries<num, num>> lineSeries = <LineSeries<num, num>>[];
 
   @override
@@ -105,15 +130,15 @@ class _ChartDialogState extends State<ChartDialog> {
       content: SizedBox(
         width: 900,
         height: 600,
-        child: ValueListenableBuilder<WalkingTableConfigModel>(
-          valueListenable: widget.walkingTableController.currentWalkingTableConfigModel,
-          builder: (_, WalkingTableConfigModel walkingTableConfigModel, ___) {
+        child: ValueListenableBuilder<WalkEdgeCostTable>(
+          valueListenable: edgeCostConfig.walkEdgeCostTableNotifier,
+          builder: (_, WalkEdgeCostTable walkEdgeCostTable, ___) {
             return Column(
               children: <Widget>[
                 Expanded(
                   child: SfCartesianChart(
                     legend: Legend(isVisible: true),
-                    series: _getLineSeries(walkingTableConfigModel),
+                    series: _getLineSeries(walkEdgeCostTable),
                     tooltipBehavior: TooltipBehavior(enable: true),
                   ),
                 ),
@@ -124,7 +149,8 @@ class _ChartDialogState extends State<ChartDialog> {
                       Expanded(
                         flex: 2,
                         child: TextField(
-                          controller: widget.walkingTableController.penaltyFunctionTextEditingController,
+                          controller: widget.walkEdgeCostTableController.penaltyFunctionTextEditingController,
+                          onSubmitted: (String value) => widget.walkEdgeCostTableController.penaltyFunction = value,
                           decoration: const InputDecoration(
                             labelText: 'Funkcja kary f(x) gdzie x to dystans',
                           ),
@@ -133,7 +159,8 @@ class _ChartDialogState extends State<ChartDialog> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
-                          controller: widget.walkingTableController.guaranteedPenaltyTextEditingController,
+                          controller: widget.walkEdgeCostTableController.guaranteedPenaltyTextEditingController,
+                          onSubmitted: (String value) => widget.walkEdgeCostTableController.guaranteedPenaltyForTransfer = double.parse(value),
                           decoration: const InputDecoration(
                             labelText: 'Gwarantowana kara (a)',
                           ),
@@ -142,7 +169,8 @@ class _ChartDialogState extends State<ChartDialog> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
-                          controller: widget.walkingTableController.speedTextEditingController,
+                          controller: widget.walkEdgeCostTableController.speedTextEditingController,
+                          onSubmitted: (String value) => widget.walkEdgeCostTableController.speed = int.parse(value),
                           decoration: const InputDecoration(
                             labelText: 'Średnia prędkość chodu (m/s)',
                           ),
@@ -151,7 +179,8 @@ class _ChartDialogState extends State<ChartDialog> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
-                          controller: widget.walkingTableController.weightTextEditingController,
+                          controller: widget.walkEdgeCostTableController.weightTextEditingController,
+                          onSubmitted: (String value) => widget.walkEdgeCostTableController.weight = int.parse(value),
                           decoration: const InputDecoration(
                             labelText: 'Waga',
                           ),
@@ -176,7 +205,7 @@ class _ChartDialogState extends State<ChartDialog> {
     );
   }
 
-  List<LineSeries<num, num>> _getLineSeries(WalkingTableConfigModel walkingTableConfigModel) {
+  List<LineSeries<num, num>> _getLineSeries(WalkEdgeCostTable walkEdgeCostTable) {
     return <LineSeries<num, num>>[
       LineSeries<num, num>(
         name: 'Wartość czasu pokonania odcinka',
@@ -184,7 +213,7 @@ class _ChartDialogState extends State<ChartDialog> {
         yAxisName: 'Minuty',
         dataSource: List<num>.generate(4, (int index) => index),
         xValueMapper: (num meters, _) => meters * 1000,
-        yValueMapper: (num meters, _) => meters * 1000 / walkingTableConfigModel.speed,
+        yValueMapper: (num meters, _) => meters * 1000 / walkEdgeCostTable.speed,
         width: 2,
         markerSettings: const MarkerSettings(),
       ),
@@ -197,12 +226,12 @@ class _ChartDialogState extends State<ChartDialog> {
         yValueMapper: (num meters, _) {
           try {
             return MathNodeExpression.fromString(
-              walkingTableConfigModel.penaltyFunction,
+              walkEdgeCostTable.walkingDistancePenaltyFunction,
               variableNames: const <String>{'x', 'a'},
             ).calc(
               MathVariableValues(<String, num>{
                 'x': meters * 10,
-                'a': walkingTableConfigModel.guaranteedPenaltyForTransfer,
+                'a': walkEdgeCostTable.guaranteedPenaltyForTransfer,
               }),
             );
           } catch (e) {

@@ -2,15 +2,15 @@ import 'package:equatable/equatable.dart';
 
 class PriorityQueueElement<T> extends Equatable {
   final T value;
-  final double cost;
+  final double priority;
 
   const PriorityQueueElement({
     required this.value,
-    required this.cost,
+    required this.priority,
   });
 
   @override
-  List<Object?> get props => <Object?>[value, cost];
+  List<Object?> get props => <Object?>[value, priority];
 }
 
 class PriorityQueue<T> {
@@ -21,14 +21,14 @@ class PriorityQueue<T> {
   /// Add a new item to the queue and ensure the highest priority element
   /// is at the front of the queue.
   void add(T value, double cost) {
-    PriorityQueueElement<T> element = PriorityQueueElement<T>(value: value, cost: cost);
+    PriorityQueueElement<T> element = PriorityQueueElement<T>(value: value, priority: cost);
     queue
       ..add(element)
       ..sort((PriorityQueueElement<T> a, PriorityQueueElement<T> b) {
-        if( a.cost == double.infinity || b.cost == double.infinity) {
+        if( a.priority == double.infinity || b.priority == double.infinity) {
           return 1;
         }
-        return (a.cost - b.cost).toInt();
+        return (a.priority - b.priority).toInt();
       });
   }
 
@@ -40,5 +40,9 @@ class PriorityQueue<T> {
 
   bool get isEmpty {
     return queue.isEmpty;
+  }
+  
+  bool get isNotEmpty {
+    return queue.isNotEmpty;
   }
 }

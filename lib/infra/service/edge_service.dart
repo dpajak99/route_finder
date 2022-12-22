@@ -19,12 +19,10 @@ class EdgeService {
         sourceVertex: fromStopVertex,
         targetVertex: toStopVertex,
         trackId: vehicleEdgeDto.trackId,
-        departureTime: vehicleEdgeDto.timeInMin,
         timeFromNow: vehicleEdgeDto.timeFromNow,
         timeToNextStop: vehicleEdgeDto.timeToNextStop,
       ));
     }
-    vehicleEdgeModelList.sort((VehicleEdge a, VehicleEdge b) => a.timeFromNow.compareTo(b.timeFromNow));
     return vehicleEdgeModelList;
   }
 }

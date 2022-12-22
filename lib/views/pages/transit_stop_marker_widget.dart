@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
 import 'package:path_finder/utils/models/edge_result.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
@@ -30,18 +29,28 @@ class TransitStopMarkerWidget extends StatelessWidget {
           ),
           Container(
             color: Colors.white,
-            child: Text(minutesToString(
-              isLast ? transitEdgeResult.currentTime + transitEdgeResult.edgeTimeEnd : transitEdgeResult.currentTime + transitEdgeResult.edgeTimeStart + transitEdgeResult.edgeTimeWait
-            )),
+            child: Text(transitEdgeResult.edgeCost.toString()),
+          ),
+          Container(
+            color: Colors.white,
+            child: Text(minutesToString(time)),
           ),
         ],
       ),
     );
   }
 
-  String minutesToString(int minutes) {
+  double get time {
+    if(isLast) {
+      return transitEdgeResult.transitSearchRequest.startTime + transitEdgeResult.edgeTimeEnd;
+    } else {
+      return transitEdgeResult.transitSearchRequest.startTime + transitEdgeResult.edgeTimeStart + transitEdgeResult.fullEdgeTime.waitingTime;
+    }
+  }
+
+  String minutesToString(num minutes) {
     int hours = minutes ~/ 60;
-    int minutesLeft = minutes % 60;
+    int minutesLeft = minutes.toInt() % 60;
     return '${hours.toString().padLeft(2, '0')}:${minutesLeft.toString().padLeft(2, '0')}';
   }
 }

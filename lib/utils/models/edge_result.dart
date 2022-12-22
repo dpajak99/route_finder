@@ -1,34 +1,22 @@
 import 'package:equatable/equatable.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
+import 'package:path_finder/utils/transit_search_request.dart';
 
 class TransitEdgeResult extends Equatable {
   final TransitEdge transitEdge;
-  final int currentTime;
-  
-  final double totalCost;
-  final int totalTime;
-
+  final TransitSearchRequest transitSearchRequest;
+  final FullEdgeTime fullEdgeTime;
   final double edgeCost;
-  final int edgeTime;
-  
-  final int edgeTimeStart;
-  final int edgeTimeWait;
-  final int edgeTimeTransit;
-  final int edgeTimeEnd;
+  final double edgeTimeStart;
+  final double edgeTimeEnd;
 
   const TransitEdgeResult({
     required this.transitEdge,
-    required this.currentTime,
-    
-    required this.totalCost,
-    required this.totalTime,
+    required this.transitSearchRequest,
+    required this.fullEdgeTime,
     
     required this.edgeCost,
-    required this.edgeTime,
-    
     required this.edgeTimeStart,
-    required this.edgeTimeWait,
-    required this.edgeTimeTransit,
     required this.edgeTimeEnd,
   });
   
@@ -36,26 +24,20 @@ class TransitEdgeResult extends Equatable {
   @override
   List<Object?> get props => <Object>[
     transitEdge,
-    currentTime,
-    totalCost,
-    totalTime,
     edgeCost,
-    edgeTime,
     edgeTimeStart,
-    edgeTimeWait,
-    edgeTimeTransit,
     edgeTimeEnd,
   ];
   
   
   @override
   String toString() {
-    return '${transitEdge.runtimeType}\t\t ($edgeCost) - start: ${parseMinToString(edgeTimeStart)}  | wait: ${edgeTimeWait}, | transit: ${edgeTimeTransit}, total ${parseMinToString(edgeTime)}| end ${parseMinToString(edgeTimeEnd)}';
+    return '${transitEdge.runtimeType}\t\t ($edgeCost) - start: ${parseMinToString(edgeTimeStart)}  | wait: ${fullEdgeTime.waitingTime}, | transit: ${fullEdgeTime.transitTime}, total ${parseMinToString(fullEdgeTime.total)}| end ${parseMinToString(edgeTimeEnd)}';
   }
   
-  String parseMinToString(int min) {
+  String parseMinToString(num min) {
     int hour = min ~/ 60;
-    int minute = min % 60;
+    int minute = min.toInt() % 60;
     return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
   }
 }

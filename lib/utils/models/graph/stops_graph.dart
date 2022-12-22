@@ -1,7 +1,7 @@
 import 'package:path_finder/utils/algorithms/haversine.dart';
-import 'package:path_finder/utils/models/directed_graph.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/edge/walk_edge.dart';
+import 'package:path_finder/utils/models/graph/directed_graph.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class StopsGraph extends DirectedGraph<StopVertex, TransitEdge> {
@@ -21,10 +21,10 @@ class StopsGraph extends DirectedGraph<StopVertex, TransitEdge> {
           WalkEdge walkEdge = WalkEdge(
             sourceVertex: sourceVertex,
             targetVertex: targetVertex,
-            distanceToWalk: Haversine.calcDistanceInMeters(sourceVertex, targetVertex),
+            distance: Haversine.calcDistanceInMeters(sourceVertex, targetVertex),
           );
 
-          if (walkEdge.distanceToWalk < maxWalkingDistanceInMeters) {
+          if (walkEdge.distance < maxWalkingDistanceInMeters) {
             walkEdges.add(walkEdge);
           }
         }

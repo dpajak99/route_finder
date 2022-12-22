@@ -1,91 +1,78 @@
-import 'dart:math';
-
+import 'package:path_finder/config/locator.dart';
+import 'package:path_finder/listeners/edge_cost_config/edge_cost_config.dart';
 import 'package:path_finder/utils/algorithms/haversine.dart';
-import 'package:path_finder/utils/models/cost_table.dart';
-import 'package:path_finder/utils/models/edge/edge.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
-import 'package:path_finder/utils/models/edge_result.dart';
-import 'package:path_finder/utils/models/vertex/geo_vertex.dart';
+import 'package:path_finder/utils/models/edge/walk_edge.dart';
+import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class VehicleEdge extends TransitEdge {
-  final String trackId;
-  final int _departureTime;
-  final int timeFromNow;
-  final int timeToNextStop;
-  final double distance;
+  final String _trackId;
+  final int _timeFromNow;
+  final int _timeToNextStop;
+  final double _distance;
 
   VehicleEdge({
     required StopVertex sourceVertex,
     required StopVertex targetVertex,
-    required this.trackId,
-    required int departureTime,
-    required this.timeFromNow,
-    required this.timeToNextStop,
-  })  : distance = Haversine.calcDistanceInMeters(sourceVertex, targetVertex),
-        _departureTime = departureTime,
+    required String trackId,
+    required int timeFromNow,
+    required int timeToNextStop,
+  })  : _distance = Haversine.calcDistanceInMeters(sourceVertex, targetVertex),
+        _trackId = trackId,
+        _timeFromNow = timeFromNow,
+        _timeToNextStop = timeToNextStop, 
         super(
           sourceVertex: sourceVertex,
           targetVertex: targetVertex,
         );
 
   @override
-  CostTable buildCostTable(TransitEdge? previousEdge, int currentTotalTime) {
-    int waitTime = calcWaitingTime(currentTotalTime);
-    return RideCostTable(
-      distanceToRide: distance,
-      vehicleTime: timeToNextStop,
-      waitTime: waitTime,
-      transfer: previousEdge is VehicleEdge && trackId != previousEdge.trackId,
+  FullEdgeTime calcTime(TransitSearchPosition transitSearchPosition) {
+    double waitingTime = _timeFromNow - transitSearchPosition.totalTimeFromStart;
+    return FullEdgeTime(transitTime: _timeToNextStop.toDouble(), waitingTime: waitingTime);
+  }
+  
+  @override
+  double calcCost(TransitSearchPosition transitSearchPosition) {
+    EdgeCostConfig edgeCostConfig = getIt<EdgeCostConfig>();
+    TransitEdge? previousTransitEdge = transitSearchPosition.previousTransitEdgeResult?.transitEdge;
+
+    FullEdgeTime fullEdgeTime = calcTime(transitSearchPosition);
+    bool isTransfer = previousTransitEdge is VehicleEdge && _trackId != previousTransitEdge._trackId;
+
+    double specificEdgeCost = edgeCostConfig.vehicleEdgeCostTable.calcCost(
+      fullEdgeTime: fullEdgeTime,
+      isTransfer: isTransfer,
     );
-  }
+    // double globalEdgeCost = edgeCostConfig.transitEdgeCostTable.calcCost(fullEdgeTime.total, _distance);
   
-  @override
-  FullEdgeTime calcFullEdgeTime(int currentTotalTime) {
-    int waitingTime = calcWaitingTime(currentTotalTime);
-    return FullEdgeTime( transitTime: timeToNextStop, waitingTime: waitingTime);
-    
+    double totalCost = specificEdgeCost;
+    return totalCost;
   }
-  
+
   @override
-  bool isTransitAvailable(TransitEdgeResult? previousEdgeResult, int currentTotalTime) {
-    if(previousEdgeResult == null ) {
+  bool canReachEdge(TransitSearchPosition transitSearchPosition) {
+    if (transitSearchPosition.isFirstEdge) {
       return true;
     }
-    return previousEdgeResult.edgeTimeEnd <= timeFromNow;
+    return transitSearchPosition.previousTransitEdgeResult!.edgeTimeEnd <= _timeFromNow;
   }
   
-  int calcWaitingTime(int currentTotalTime) {
-    return timeFromNow - currentTotalTime;
-  }
 
-  ////////////////////
-  int calcFromStart(StopVertex stopVertex) {
-    return euclideanDistance(stopVertex).toInt();
-  }
-
-  double euclideanDistance(StopVertex from) {
-    return sqrt(pow(from.lat - targetVertex.lat, 2) + pow(from.long - targetVertex.long, 2));
-  }
-
-  String getTimeAsString() {
-    int fullTimeMinutes = _departureTime;
+  String getTimeAsString(int time) {
+    int fullTimeMinutes = time;
     int hours = fullTimeMinutes ~/ 60;
     int minutes = fullTimeMinutes % 60;
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
   }
-
-  String getTimeFromNowAsString() {
-    int hours = timeFromNow ~/ 60;
-    int minutes = timeFromNow % 60;
-    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
-  }
-
-  @override
-  List<Object?> get props => <Object?>[sourceVertex, targetVertex, trackId, timeFromNow, timeToNextStop];
-
+  
   @override
   String toString() {
-    return 'BUS: From: ${sourceVertex.name}, To: ${targetVertex.name}, Time: ${getTimeAsString()}, Time from now: ${getTimeFromNowAsString()} Track: $trackId';
+    return 'BUS: From: ${sourceVertex.name}, To: ${targetVertex.name}, Time from now: ${getTimeAsString(_timeFromNow)} Track: $_trackId';
   }
+
+  @override
+  List<Object?> get props => <Object?>[sourceVertex, targetVertex, _trackId, _timeFromNow, _timeToNextStop];
+
 }

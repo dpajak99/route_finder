@@ -1,46 +1,50 @@
-import 'package:path_finder/utils/models/cost_table.dart';
+import 'package:path_finder/config/locator.dart';
+import 'package:path_finder/listeners/edge_cost_config/edge_cost_config.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
-import 'package:path_finder/utils/models/edge_result.dart';
+import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class WalkEdge extends TransitEdge {
-  static const int averageWalkingSpeedMeterPerMinute = 50;
-  
-  final double distanceToWalk;
-  final int _fullTransitTime;
+  final EdgeCostConfig edgeCostConfig = getIt<EdgeCostConfig>();
+  final double distance;
 
-  const WalkEdge({
+  WalkEdge({
     required StopVertex sourceVertex,
     required StopVertex targetVertex,
-    required this.distanceToWalk,
-  })  : _fullTransitTime = distanceToWalk ~/ averageWalkingSpeedMeterPerMinute,
-        super(
+    required this.distance,
+  }) : super(
           sourceVertex: sourceVertex,
           targetVertex: targetVertex,
         );
-
-  @override
-  FullEdgeTime calcFullEdgeTime(int currentTotalTime) {
-    return FullEdgeTime( waitingTime: 0, transitTime: _fullTransitTime);
-  }
-
-  @override
-  CostTable buildCostTable(TransitEdge? previousEdge, int currentTotalTime) {
-    return WalkCostTable(distanceToWalk: distanceToWalk, walkingTime: _fullTransitTime);
-  }
   
   @override
-  bool isTransitAvailable(TransitEdgeResult? previousEdgeResult, int currentTotalTime) {
-    if( previousEdgeResult == null ) {
+  FullEdgeTime calcTime(TransitSearchPosition transitSearchPosition) => FullEdgeTime( waitingTime: 0, transitTime: _walkingTime);
+  
+
+  @override
+  double calcCost(TransitSearchPosition transitSearchPosition) {
+    FullEdgeTime fullEdgeTime = calcTime(transitSearchPosition);
+    
+    double specificEdgeCost = edgeCostConfig.walkEdgeCostTable.calcCost(distance, fullEdgeTime.total);
+    // double globalEdgeCost = edgeCostConfig.transitEdgeCostTable.calcCost(fullEdgeTime.total, distance);
+    
+    return specificEdgeCost;
+  }
+
+  @override
+  bool canReachEdge(TransitSearchPosition transitSearchPosition) {
+    if (transitSearchPosition.isFirstEdge) {
       return true;
     }
-    bool nextWalkEdgeInLine = previousEdgeResult.transitEdge is WalkEdge;
-    return nextWalkEdgeInLine == false && previousEdgeResult.edgeTimeEnd <= currentTotalTime;
+    bool nextWalkEdgeInLine = transitSearchPosition.previousTransitEdgeResult?.transitEdge is WalkEdge;
+    bool edgeTimeExpired = transitSearchPosition.previousTransitEdgeResult!.edgeTimeEnd > transitSearchPosition.totalTimeFromStart;
+    return nextWalkEdgeInLine == false && edgeTimeExpired == false;
   }
   
-  
+  double get _walkingTime => distance / edgeCostConfig.walkEdgeCostTable.speed;
+
   @override
   String toString() {
-    return 'WALK: ${sourceVertex.name} -> ${targetVertex.name} (${distanceToWalk.toStringAsFixed(2)}m) ${_fullTransitTime.toStringAsFixed(2)}min';
+    return 'WALK: ${sourceVertex.name} -> ${targetVertex.name} (${distance.toStringAsFixed(2)}m) ${_walkingTime.toStringAsFixed(2)}min';
   }
 }

@@ -16,7 +16,7 @@ class StopRepository {
   }
 
   Future<List<StopEntity>> getAll() async {
-    List<Map<String, Map<String, dynamic>>> result = await sql.mappedResultsQuery('SELECT * FROM schedule.bus_stops bs WHERE bs.lat is not null AND bs.lng is not null and bs.id in (SELECT DISTINCT d.bus_stop_id FROM schedule.departures d join schedule.tracks t on t.id = d.track_id join schedule.routes r on r.id = t.route_id join schedule.bus_lines bl on bl.id = r.bus_line_id where bl.version_id = 10  )');
+    List<Map<String, Map<String, dynamic>>> result = await sql.mappedResultsQuery('SELECT * FROM schedule.bus_stops bs WHERE bs.lat is not null AND bs.lng is not null and bs.id in (SELECT DISTINCT d.bus_stop_id FROM schedule.departures d join schedule.tracks t on t.id = d.track_id join schedule.routes r on r.id = t.route_id join schedule.bus_lines bl on bl.id = r.bus_line_id where bl.version_id = 10 )');
     return result.map((Map<String, Map<String, dynamic>> fullRow) {
       return StopEntity.fromJson(fullRow['bus_stops'] as Map<String, dynamic>);
     }).toList();

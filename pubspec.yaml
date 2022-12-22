@@ -41,6 +41,7 @@ dependencies:
   intl: ^0.17.0
   syncfusion_flutter_charts: ^20.3.61
   dropdown_button2: ^1.9.2
+  get_it: ^7.2.0
   flutter:
     sdk: flutter
 

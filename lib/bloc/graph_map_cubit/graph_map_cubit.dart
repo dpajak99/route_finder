@@ -1,27 +1,28 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_finder/bloc/graph_map_cubit/graph_map_state.dart';
 import 'package:path_finder/bloc/stop_select_cubit/stop_select_cubit.dart';
+import 'package:path_finder/config/locator.dart';
 import 'package:path_finder/infra/service/edge_service.dart';
 import 'package:path_finder/infra/service/stop_service.dart';
+import 'package:path_finder/listeners/edge_cost_config/edge_cost_config.dart';
 import 'package:path_finder/utils/algorithms/dijkstra.dart';
-import 'package:path_finder/utils/models/cost_config.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
 import 'package:path_finder/utils/models/edge_result.dart';
+import 'package:path_finder/utils/models/graph/stops_graph.dart';
 import 'package:path_finder/utils/models/markers/stop_marker.dart';
 import 'package:path_finder/utils/models/markers/transit_stop_marker.dart';
-import 'package:path_finder/utils/models/stops_graph.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
+import 'package:path_finder/utils/transit_search_request.dart';
 
 class GraphMapCubit extends Cubit<GraphMapState> {
   final StopSelectCubit stopSelectCubit = StopSelectCubit();
-  
+  final EdgeCostConfig edgeCostConfig = getIt<EdgeCostConfig>();
+
   final StopService _stopService = StopService();
   final EdgeService _edgeService = EdgeService();
 
   late StopsGraph stopsGraph;
-
-  CostConfig costConfig = CostConfig();
 
   GraphMapCubit() : super(GraphMapLoadingState());
 
@@ -34,7 +35,7 @@ class GraphMapCubit extends Cubit<GraphMapState> {
   }
 
   Future<void> search() async {
-    if( stopSelectCubit.state.isComplete == false ) {
+    if (stopSelectCubit.state.isComplete == false) {
       print('Error');
       return;
     }
@@ -47,8 +48,15 @@ class GraphMapCubit extends Cubit<GraphMapState> {
     Dijkstra dijkstra = Dijkstra();
     DateTime dateTime = stopSelectCubit.state.dateTime;
     int minutes = 60 * dateTime.hour + dateTime.minute;
-    
-    List<TransitEdgeResult> path = dijkstra.singleSourceShortestPaths(stopsGraph, stopSelectCubit.state.sourceVertex!, stopSelectCubit.state.targetVertex!, costConfig, minutes);
+
+    TransitSearchRequest transitSearchRequest = TransitSearchRequest(
+      stopsGraph: stopsGraph,
+      sourceVertex: stopSelectCubit.state.sourceVertex!,
+      targetVertex: stopSelectCubit.state.targetVertex!,
+      startTime: minutes,
+    );
+
+    List<TransitEdgeResult> path = dijkstra.search(transitSearchRequest);
     List<StopMarker> markers = List<StopMarker>.empty(growable: true);
     for (int i = 0; i < path.length; i++) {
       TransitEdgeResult transitEdgeResult = path[i];
@@ -58,7 +66,7 @@ class GraphMapCubit extends Cubit<GraphMapState> {
         transitEdgeResult: transitEdgeResult,
         isLast: false,
       ));
-      if( isLast ) {
+      if (isLast) {
         markers.add(TransitStopMarker(
           stopVertex: transitEdgeResult.transitEdge.targetVertex,
           transitEdgeResult: transitEdgeResult,

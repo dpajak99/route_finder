@@ -1,6 +1,5 @@
-import 'package:path_finder/utils/models/cost_table.dart';
 import 'package:path_finder/utils/models/edge/edge.dart';
-import 'package:path_finder/utils/models/edge_result.dart';
+import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 abstract class TransitEdge extends Edge<StopVertex> {
@@ -12,18 +11,18 @@ abstract class TransitEdge extends Edge<StopVertex> {
           targetVertex: targetVertex,
         );
 
-  CostTable buildCostTable(TransitEdge? previousEdge, int currentTotalTime);
+  FullEdgeTime calcTime(TransitSearchPosition transitSearchPosition);
+  
+  double calcCost(TransitSearchPosition transitSearchPosition);
 
-  bool isTransitAvailable(TransitEdgeResult? previousEdgeResult, int currentTotalTime);
-
-  FullEdgeTime calcFullEdgeTime(int currentTotalTime);
+  bool canReachEdge(TransitSearchPosition transitSearchPosition);
 }
 
 class FullEdgeTime {
-  final int waitingTime;
-  final int transitTime;
-  
-  int get total => waitingTime + transitTime;
+  final double waitingTime;
+  final double transitTime;
+
+  double get total => waitingTime + transitTime;
 
   FullEdgeTime({
     required this.waitingTime,
