@@ -26,9 +26,9 @@ class PriorityQueue<T> {
       ..add(element)
       ..sort((PriorityQueueElement<T> a, PriorityQueueElement<T> b) {
         if( a.priority == double.infinity || b.priority == double.infinity) {
-          return 1;
+          return -1;
         }
-        return (a.priority - b.priority).toInt();
+        return a.priority.compareTo(b.priority);
       });
   }
 

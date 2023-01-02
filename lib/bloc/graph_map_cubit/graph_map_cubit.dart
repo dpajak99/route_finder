@@ -5,6 +5,9 @@ import 'package:path_finder/config/locator.dart';
 import 'package:path_finder/infra/service/edge_service.dart';
 import 'package:path_finder/infra/service/stop_service.dart';
 import 'package:path_finder/listeners/edge_cost_config/edge_cost_config.dart';
+import 'package:path_finder/utils/algorithms/a_star.dart';
+import 'package:path_finder/utils/algorithms/bfs.dart';
+import 'package:path_finder/utils/algorithms/dfs.dart';
 import 'package:path_finder/utils/algorithms/dijkstra.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
@@ -45,7 +48,10 @@ class GraphMapCubit extends Cubit<GraphMapState> {
       ..addStops(stopVertexList)
       ..addEdgeIterable(edges);
 
-    Dijkstra dijkstra = Dijkstra();
+    // Dijkstra dijkstra = Dijkstra();
+    // Bfs bfs = Bfs();
+    // Dfs dfs = Dfs();
+    AStar aStar = AStar();
     DateTime dateTime = stopSelectCubit.state.dateTime;
     int minutes = 60 * dateTime.hour + dateTime.minute;
 
@@ -56,7 +62,11 @@ class GraphMapCubit extends Cubit<GraphMapState> {
       startTime: minutes,
     );
 
-    List<TransitEdgeResult> path = dijkstra.search(transitSearchRequest);
+    // List<TransitEdgeResult> path = dijkstra.search(transitSearchRequest).path;
+    // List<TransitEdgeResult> path = bfs.search(transitSearchRequest).path;
+    // List<TransitEdgeResult> path = dfs.search(transitSearchRequest).path;
+    List<TransitEdgeResult> path = aStar.search(transitSearchRequest).path;
+    
     List<StopMarker> markers = List<StopMarker>.empty(growable: true);
     for (int i = 0; i < path.length; i++) {
       TransitEdgeResult transitEdgeResult = path[i];

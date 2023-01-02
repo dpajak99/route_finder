@@ -16,10 +16,12 @@ class WalkEdge extends TransitEdge {
           sourceVertex: sourceVertex,
           targetVertex: targetVertex,
         );
+
+  @override
+  double get transitStartTime => double.infinity;
   
   @override
   FullEdgeTime calcTime(TransitSearchPosition transitSearchPosition) => FullEdgeTime( waitingTime: 0, transitTime: _walkingTime);
-  
 
   @override
   double calcCost(TransitSearchPosition transitSearchPosition) {

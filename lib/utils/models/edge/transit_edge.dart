@@ -10,6 +10,8 @@ abstract class TransitEdge extends Edge<StopVertex> {
           sourceVertex: sourceVertex,
           targetVertex: targetVertex,
         );
+  
+  double get transitStartTime;
 
   FullEdgeTime calcTime(TransitSearchPosition transitSearchPosition);
   
@@ -28,4 +30,9 @@ class FullEdgeTime {
     required this.waitingTime,
     required this.transitTime,
   });
+  
+  @override
+  String toString() {
+    return 'FullEdgeTime(waitingTime: $waitingTime, transitTime: $transitTime)';
+  }
 }

@@ -11,7 +11,7 @@ class EdgeCostConfig {
 
   final WalkEdgeCostTable _defaultWalkEdgeCostTable = WalkEdgeCostTable(
     walkingDistancePenaltyFunction: '5^((1/800)*x) + a',
-    guaranteedPenaltyForTransfer: 1,
+    guaranteedPenaltyForTransfer: 10,
     speed: 50,
     weight: 1,
   );

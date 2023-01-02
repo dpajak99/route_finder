@@ -37,12 +37,12 @@ class AppLayout extends StatelessWidget {
                       Expanded(
                         child: map,
                       ),
-                      Container(
-                        color: const Color.fromARGB(255, 43, 43, 43),
-                        height: 200,
-                        width: double.infinity,
-                        child: terminal,
-                      ),
+                      // Container(
+                      //   color: const Color.fromARGB(255, 43, 43, 43),
+                      //   height: 200,
+                      //   width: double.infinity,
+                      //   child: terminal,
+                      // ),
                     ],
                   ),
                 ),

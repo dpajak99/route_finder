@@ -6,30 +6,31 @@ class TransitEdgeResult extends Equatable {
   final TransitEdge transitEdge;
   final TransitSearchRequest transitSearchRequest;
   final FullEdgeTime fullEdgeTime;
-  final double edgeCost;
+
   final double edgeTimeStart;
   final double edgeTimeEnd;
+
+  final double? edgeCost;
 
   const TransitEdgeResult({
     required this.transitEdge,
     required this.transitSearchRequest,
     required this.fullEdgeTime,
-    
-    required this.edgeCost,
     required this.edgeTimeStart,
     required this.edgeTimeEnd,
+    this.edgeCost,
   });
   
   
   @override
-  List<Object?> get props => <Object>[
+  List<Object?> get props => <Object?>[
     transitEdge,
     edgeCost,
     edgeTimeStart,
     edgeTimeEnd,
   ];
   
-  
+
   @override
   String toString() {
     return '${transitEdge.runtimeType}\t\t ($edgeCost) - start: ${parseMinToString(edgeTimeStart)}  | wait: ${fullEdgeTime.waitingTime}, | transit: ${fullEdgeTime.transitTime}, total ${parseMinToString(fullEdgeTime.total)}| end ${parseMinToString(edgeTimeEnd)}';

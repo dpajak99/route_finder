@@ -1,5 +1,4 @@
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
-import 'package:path_finder/utils/models/edge/walk_edge.dart';
 import 'package:path_finder/utils/models/edge_result.dart';
 import 'package:path_finder/utils/models/graph/stops_graph.dart';
 import 'package:path_finder/utils/models/queue/priority_queue.dart';
@@ -29,7 +28,7 @@ class Dijkstra {
     while (_unvisitedStopsQueue.isNotEmpty) {
       PriorityQueueElement<StopVertex> currentQueueElement = _unvisitedStopsQueue.pop();
       StopVertex currentStopVertex = currentQueueElement.value;
-      double distanceFromSourceVertex = currentQueueElement.priority;
+      // double distanceFromSourceVertex = currentQueueElement.priority;
       
       TransitEdgeResult? previousEdgeResult = _visitedEdgesHistory[currentStopVertex];
 
@@ -44,13 +43,7 @@ class Dijkstra {
       
 
       List<TransitEdge> neighbors = _stopsGraph[currentStopVertex] ?? List<TransitEdge>.empty();
-      if(transitSearchPosition.isFirstEdge) {
-        for(TransitEdge edge in neighbors) {
-          if(edge is WalkEdge) {
-            print(edge);
-          }
-        }
-      }
+
       for (TransitEdge neighborEdge in neighbors) {
         bool isTransitAvailable = neighborEdge.canReachEdge(transitSearchPosition);
         if (isTransitAvailable == false) {
@@ -132,7 +125,7 @@ class Dijkstra {
 
     StopVertex currentVertex = _targetVertex;
     while (currentVertex != _sourceVertex) {
-      TransitEdgeResult? currentEdge = _visitedEdgesHistory[currentVertex]!;
+      TransitEdgeResult currentEdge = _visitedEdgesHistory[currentVertex]!;
       path.add(currentEdge);
       currentVertex = currentEdge.transitEdge.sourceVertex;
     }

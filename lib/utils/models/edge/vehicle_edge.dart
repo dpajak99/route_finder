@@ -28,6 +28,9 @@ class VehicleEdge extends TransitEdge {
         );
 
   @override
+  double get transitStartTime => _timeFromNow.toDouble();
+  
+  @override
   FullEdgeTime calcTime(TransitSearchPosition transitSearchPosition) {
     double waitingTime = _timeFromNow - transitSearchPosition.totalTimeFromStart;
     return FullEdgeTime(transitTime: _timeToNextStop.toDouble(), waitingTime: waitingTime);
