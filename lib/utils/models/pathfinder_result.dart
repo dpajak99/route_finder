@@ -1,151 +1,219 @@
-// import 'package:path_finder/utils/models/edge/transit_edge.dart';
-// import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
-// import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
-//
-// class PathFinderResult {
-//   final List<PathFinderResultAction> actions;
-//
-//   PathFinderResult({required this.actions});
-//
-//   factory PathFinderResult.fromEdges(List<TransitEdge> edges) {
-//     final List<PathFinderResultAction> actions = <PathFinderResultAction>[];
-//
-//     for (int i = 0; i < edges.length; i++) {
-//       TransitEdge currentEdge = edges[i];
-//       TransitEdge? previousEdge = i > 0 ? edges[i - 1] : null;
-//
-//       if (i == 0) {
-//         actions.add(StartAction.fromEdge(currentEdge));
-//       } else if (i == edges.length - 1) {
-//         actions.add(EndAction.fromEdge(currentEdge));
-//       } else if (currentEdge is VehicleEdge) {
-//         if (previousEdge is VehicleEdge && previousEdge.trackId != currentEdge.trackId) {
-//           actions.add(TransferAction.fromEdge(currentEdge));
-//         } else {
-//           actions.add(RideAction.fromEdge(currentEdge));
-//         }
-//       } else {
-//         actions.add(WalkAction.fromEdge(currentEdge));
-//       }
-//     }
-//
-//     return PathFinderResult(actions: actions);
-//   }
-//
-//   void printRoute() {
-//     for (PathFinderResultAction edge in actions) {
-//       print(edge);
-//     }
-//   }
-// }
-//
-// class PathFinderResultAction {
-//   final StopVertex sourceVertex;
-//   final StopVertex targetVertex;
-//   final int departureTime;
-//   final int arrivalTime;
-//   final int actionDuration; 
-//
-//   PathFinderResultAction({
-//     required this.sourceVertex,
-//     required this.targetVertex,
-//     required this.departureTime,
-//     required this.arrivalTime,
-//     required this.actionDuration,
-//   });
-//
-//   PathFinderResultAction.fromEdge(TransitEdge transitEdge)
-//       : this(
-//           sourceVertex: transitEdge.sourceVertex,
-//           targetVertex: transitEdge.targetVertex,
-//           departureTime: transitEdge.departureTime,
-//           arrivalTime: transitEdge.arrivalTime,
-//           actionDuration: transitEdge.edgeTime.toInt(),
-//         );
-//
-//   String minutesToTimeString(int minutes) {
-//     int hours = minutes ~/ 60;
-//     int minutesLeft = minutes % 60;
-//     return '${hours.toString().padLeft(2, '0')}:${minutesLeft.toString().padLeft(2, '0')}';
-//   }
-// }
-//
-// class StartAction extends PathFinderResultAction {
-//   StartAction.fromEdge(TransitEdge transitEdge)
-//       : super(
-//           actionDuration: transitEdge.edgeTime.toInt(),
-//           sourceVertex: transitEdge.sourceVertex,
-//           targetVertex: transitEdge.targetVertex,
-//           departureTime: transitEdge.departureTime,
-//           arrivalTime: transitEdge.arrivalTime,
-//         );
-//
-//   @override
-//   String toString() {
-//     return 'START: ${minutesToTimeString(departureTime)} # $actionDuration # - ${sourceVertex.name} -> ${targetVertex.name} ';
-//   }
-// }
-//
-// class EndAction extends PathFinderResultAction {
-//   EndAction.fromEdge(TransitEdge transitEdge)
-//       : super(
-//           actionDuration: transitEdge.edgeTime.toInt(),
-//           sourceVertex: transitEdge.sourceVertex,
-//           targetVertex: transitEdge.targetVertex,
-//           departureTime: transitEdge.departureTime,
-//           arrivalTime: transitEdge.arrivalTime,
-//         );
-//
-//   @override
-//   String toString() {
-//     return 'END: ${minutesToTimeString(arrivalTime)} # $actionDuration # - ${sourceVertex.name} -> ${targetVertex.name} ';
-//   }
-// }
-//
-// class TransferAction extends PathFinderResultAction {
-//   TransferAction.fromEdge(TransitEdge transitEdge)
-//       : super(
-//           actionDuration: transitEdge.edgeTime.toInt(),
-//           sourceVertex: transitEdge.sourceVertex,
-//           targetVertex: transitEdge.targetVertex,
-//           departureTime: transitEdge.departureTime,
-//           arrivalTime: transitEdge.arrivalTime,
-//         );
-//
-//   @override
-//   String toString() {
-//     return 'TRANSFER: ${minutesToTimeString(departureTime)} # $actionDuration # - ${sourceVertex.name} -> ${targetVertex.name} ';
-//   }
-// }
-//
-// class WalkAction extends PathFinderResultAction {
-//   WalkAction.fromEdge(TransitEdge transitEdge)
-//       : super(
-//           actionDuration: transitEdge.edgeTime.toInt(),
-//           sourceVertex: transitEdge.sourceVertex,
-//           targetVertex: transitEdge.targetVertex,
-//           departureTime: transitEdge.departureTime,
-//           arrivalTime: transitEdge.arrivalTime,
-//         );
-//
-//   @override
-//   String toString() {
-//     return 'WALK: ${minutesToTimeString(departureTime)} # $actionDuration # - ${sourceVertex.name} -> ${targetVertex.name} ';
-//   }
-// }
-//
-// class RideAction extends PathFinderResultAction {
-//   RideAction.fromEdge(TransitEdge transitEdge)
-//       : super(
-//           actionDuration: transitEdge.edgeTime.toInt(),
-//           sourceVertex: transitEdge.sourceVertex,
-//           targetVertex: transitEdge.targetVertex,
-//           departureTime: transitEdge.departureTime,
-//           arrivalTime: transitEdge.arrivalTime,
-//         );
-//
-//   @override
-//   String toString() {
-//     return 'RIDE: ${minutesToTimeString(departureTime)} # $actionDuration # - ${sourceVertex.name} -> ${targetVertex.name} ';
-//   }
-// }
+import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
+import 'package:path_finder/utils/models/edge/walk_edge.dart';
+import 'package:path_finder/utils/models/edge_details.dart';
+import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
+
+class PathfinderResult {
+  final DateTime initialTime;
+  final List<EdgeDetails> path;
+  final List<StopVertex> visitedStopsHistory;
+
+  PathfinderResult({
+    required this.initialTime,
+    required this.path,
+    required this.visitedStopsHistory,
+  });
+
+  List<PathfinderResultStoryAction> get story {
+    List<PathfinderResultStoryAction> story = <PathfinderResultStoryAction>[];
+    for (int i = 0; i < path.length; i++) {
+      EdgeDetails edgeDetails = path[i];
+      EdgeDetails? previousEdgeDetails = i > 0 ? path[i - 1] : null;
+      EdgeDetails? nextEdgeDetails = i + 1 < path.length ? path[i + 1] : null;
+      int totalTime = edgeDetails.edgeTimeEnd.toInt();
+      DateTime startTime = initialTime.add(Duration(minutes: edgeDetails.edgeTimeStart.toInt()));
+      DateTime arrivalTime = initialTime.add(Duration(minutes: totalTime));
+
+      bool isLast = nextEdgeDetails == null;
+      if (isLast) {
+        story.add(ArrivalAction(targetVertex: edgeDetails.transitEdge.targetVertex, totalTime: totalTime, arrivalTime: arrivalTime));
+        break;
+      }
+
+      bool isStart = previousEdgeDetails == null;
+      if (isStart) {
+        story.add(StartAction(sourceVertex: edgeDetails.transitEdge.sourceVertex, startTime: initialTime));
+      }
+
+      bool isWalking = edgeDetails.transitEdge is WalkEdge;
+      if (isWalking) {
+        story.add(WalkAction(
+          sourceVertex: edgeDetails.transitEdge.sourceVertex,
+          targetVertex: edgeDetails.transitEdge.targetVertex,
+          totalTime: totalTime,
+          startTime: startTime,
+          arrivalTime: arrivalTime,
+        ));
+      }
+
+      bool isVehicle = edgeDetails.transitEdge is VehicleEdge;
+      if (isVehicle) {
+        VehicleEdge currentVehicleEdge = edgeDetails.transitEdge as VehicleEdge;
+        bool isPreviousVehicle = previousEdgeDetails?.transitEdge is VehicleEdge;
+        if (isPreviousVehicle) {
+          VehicleEdge previousVehicleEdge = previousEdgeDetails!.transitEdge as VehicleEdge;
+          bool isTransit = currentVehicleEdge.trackId != previousVehicleEdge.trackId;
+          if (isTransit) {
+            story.add(LeaveVehicleAction(stopVertex: previousVehicleEdge.targetVertex, leaveTrackId: previousVehicleEdge.trackId));
+          } else {
+            story.add(TripAction(
+              sourceVertex: edgeDetails.transitEdge.sourceVertex,
+              targetVertex: edgeDetails.transitEdge.targetVertex,
+              totalTime: totalTime,
+              startTime: startTime,
+              arrivalTime: arrivalTime,
+              trackId: currentVehicleEdge.trackId,
+            ));
+            continue;
+          }
+        }
+        story.add(WaitAction(
+          stopVertex: edgeDetails.transitEdge.sourceVertex,
+          waitTime: edgeDetails.fullTime.waitingTime.toInt(),
+        ));
+        
+        startTime = startTime.add(Duration(minutes: edgeDetails.fullTime.waitingTime.toInt()));
+        story.add(EnterVehicleAction(
+          stopVertex: edgeDetails.transitEdge.sourceVertex,
+          trackId: currentVehicleEdge.trackId,
+          time: startTime,
+        ));
+
+        story.add(TripAction(
+          sourceVertex: edgeDetails.transitEdge.sourceVertex,
+          targetVertex: edgeDetails.transitEdge.targetVertex,
+          totalTime: edgeDetails.fullTime.transitTime.toInt(),
+          startTime: startTime,
+          arrivalTime: arrivalTime,
+          trackId: currentVehicleEdge.trackId,
+        ));
+      }
+    }
+    return story;
+  }
+}
+
+abstract class PathfinderResultStoryAction {}
+
+class StartAction extends PathfinderResultStoryAction {
+  final StopVertex sourceVertex;
+  final DateTime startTime;
+
+  StartAction({
+    required this.sourceVertex,
+    required this.startTime,
+  });
+  
+  @override
+  String toString() {
+    return 'StartAction{sourceVertex: ${sourceVertex.name}, startTime: $startTime}';
+  }
+}
+
+class ArrivalAction extends PathfinderResultStoryAction {
+  final StopVertex targetVertex;
+  final DateTime arrivalTime;
+  final int totalTime;
+
+  ArrivalAction({
+    required this.targetVertex,
+    required this.arrivalTime,
+    required this.totalTime,
+  });
+  
+  @override
+  String toString() {
+    return 'ArrivalAction{targetVertex: ${targetVertex.name}, arrivalTime: $arrivalTime, totalTime: $totalTime}';
+  }
+}
+
+class WalkAction extends PathfinderResultStoryAction {
+  final StopVertex sourceVertex;
+  final StopVertex targetVertex;
+  final DateTime startTime;
+  final DateTime arrivalTime;
+  final int totalTime;
+
+  WalkAction({
+    required this.sourceVertex,
+    required this.targetVertex,
+    required this.startTime,
+    required this.arrivalTime,
+    required this.totalTime,
+  });
+  
+  @override
+  String toString() {
+    return 'WalkAction{sourceVertex: ${sourceVertex.name}, targetVertex: ${targetVertex.name}, startTime: $startTime, arrivalTime: $arrivalTime, totalTime: $totalTime}';
+  }
+}
+
+class LeaveVehicleAction extends PathfinderResultStoryAction {
+  final StopVertex stopVertex;
+  final String leaveTrackId;
+
+  LeaveVehicleAction({
+    required this.stopVertex,
+    required this.leaveTrackId,
+  });
+  
+  @override
+  String toString() {
+    return 'LeaveVehicleAction{stopVertex: ${stopVertex.name}, leaveTrackId: $leaveTrackId}';
+  }
+}
+
+class TripAction extends PathfinderResultStoryAction {
+  final StopVertex sourceVertex;
+  final StopVertex targetVertex;
+  final DateTime startTime;
+  final DateTime arrivalTime;
+  final int totalTime;
+  final String trackId;
+
+  TripAction({
+    required this.sourceVertex,
+    required this.targetVertex,
+    required this.startTime,
+    required this.arrivalTime,
+    required this.totalTime,
+    required this.trackId,
+  });
+  
+  @override
+  String toString() {
+    return 'TripAction{sourceVertex: ${sourceVertex.name}, targetVertex: ${targetVertex.name}, startTime: $startTime, arrivalTime: $arrivalTime, totalTime: $totalTime, trackId: $trackId}';
+  }
+}
+
+class WaitAction extends PathfinderResultStoryAction {
+  final StopVertex stopVertex;
+  final int waitTime;
+
+  WaitAction({
+    required this.stopVertex,
+    required this.waitTime,
+  });
+  
+  @override
+  String toString() {
+    return 'WaitAction{stopVertex: ${stopVertex.name}, waitTime: $waitTime}';
+  }
+}
+
+class EnterVehicleAction extends PathfinderResultStoryAction {
+  final StopVertex stopVertex;
+  final String trackId;
+  final DateTime time;
+
+  EnterVehicleAction({
+    required this.stopVertex,
+    required this.trackId,
+    required this.time,
+  });
+  
+  @override
+  String toString() {
+    return 'EnterVehicleAction{stopVertex: ${stopVertex.name}, trackId: $trackId, time: $time}';
+  }
+}

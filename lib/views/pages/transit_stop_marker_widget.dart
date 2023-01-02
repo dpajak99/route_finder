@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:path_finder/utils/models/edge_result.dart';
+import 'package:path_finder/utils/models/edge_details.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class TransitStopMarkerWidget extends StatelessWidget {
-  final TransitEdgeResult transitEdgeResult;
+  final EdgeDetails edgeDetails;
   final StopVertex stopVertex;
   final bool isLast;
 
   const TransitStopMarkerWidget({
-    required this.transitEdgeResult,
+    required this.edgeDetails,
     required this.stopVertex,
     required this.isLast,
     super.key,
@@ -29,11 +29,11 @@ class TransitStopMarkerWidget extends StatelessWidget {
           ),
           Container(
             color: Colors.white,
-            child: Text(transitEdgeResult.edgeCost.toString()),
+            child: Text(edgeDetails.cost.toString()),
           ),
           Container(
             color: Colors.white,
-            child: Text(minutesToString(time)),
+            child: Text('${minutesToString(time)} (${edgeDetails.fullTime.waitingTime})'),
           ),
         ],
       ),
@@ -42,9 +42,9 @@ class TransitStopMarkerWidget extends StatelessWidget {
 
   double get time {
     if(isLast) {
-      return transitEdgeResult.transitSearchRequest.startTime + transitEdgeResult.edgeTimeEnd;
+      return edgeDetails.edgeTimeEnd;
     } else {
-      return transitEdgeResult.transitSearchRequest.startTime + transitEdgeResult.edgeTimeStart + transitEdgeResult.fullEdgeTime.waitingTime;
+      return edgeDetails.edgeTimeStart;
     }
   }
 

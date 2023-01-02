@@ -1,33 +1,42 @@
-class StackQueue<T> {
+import 'package:path_finder/utils/models/queue/queue.dart';
+
+class StackQueue<T> extends Queue<T> {
 // List to store stack elements
-  final List<T> _elements = List<T>.empty(growable: true);
+  final List<T> _stack = List<T>.empty(growable: true);
 
-// Adds an element to the stack
+  // Adds an element to the stack
   void push(T element) {
-    _elements.add(element);
+    _stack.add(element);
   }
 
-// Gets the element from the stack (without removing it)
+  // Gets the element from the stack (without removing it)
   T peek() {
-    if (_elements.isEmpty) {
+    if (_stack.isEmpty) {
       throw Exception('Stack is empty');
     }
-    return _elements.last;
+    return _stack.last;
   }
 
-// Removes and returns the element from the stack
+  // Removes and returns the element from the stack
+  @override
   T pop() {
-    if (_elements.isEmpty) {
+    if (_stack.isEmpty) {
       throw Exception('Stack is empty');
     }
-    return _elements.removeLast();
+    return _stack.removeLast();
   }
 
-// Returns true if the stack is empty, false otherwise
-  bool get isEmpty => _elements.isEmpty;
+  @override
+  void clear() {
+    _stack.clear();
+  }
   
-  bool get isNotEmpty => _elements.isNotEmpty;
-
-// Returns the size of the stack
-  int get length => _elements.length;
+  @override
+  bool get isEmpty => _stack.isEmpty;
+  
+  @override
+  bool get isNotEmpty => _stack.isNotEmpty;
+  
+  @override
+  int get length => _stack.length;
 }

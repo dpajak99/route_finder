@@ -5,7 +5,7 @@ import 'package:path_finder/utils/models/graph/directed_graph.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class StopsGraph extends DirectedGraph<StopVertex, TransitEdge> {
-  static const double maxWalkingDistanceInMeters = 100;
+  static const double maxWalkingDistanceInMeters = 3000;
 
   void addStops(List<StopVertex> stops) {
     addVertexIterable(stops);

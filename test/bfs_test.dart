@@ -1,13 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_finder/config/locator.dart';
 import 'package:path_finder/utils/algorithms/bfs.dart';
-import 'package:path_finder/utils/algorithms/dfs.dart';
 import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
-import 'package:path_finder/utils/models/edge_result.dart';
+import 'package:path_finder/utils/models/edge_details.dart';
 import 'package:path_finder/utils/models/graph/stops_graph.dart';
-import 'package:path_finder/utils/models/path_search_result.dart';
+import 'package:path_finder/utils/models/pathfinder_result.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
-import 'package:path_finder/utils/transit_search_request.dart';
 
 void main() {
   initLocator();
@@ -50,24 +48,22 @@ void main() {
   stopsGraph.addEdge(VehicleEdge(sourceVertex: vertex6, targetVertex: vertex11, trackId: '1', timeFromNow: 3, timeToNextStop: 1));
 
   test('', () {
-    Bfs bfs = Bfs();
-    TransitSearchRequest transitSearchRequest = TransitSearchRequest(stopsGraph: stopsGraph, sourceVertex: vertex1, targetVertex: vertex7, startTime: 0);
+    Bfs bfs = Bfs(stopsGraph: stopsGraph, sourceVertex: vertex1, targetVertex: vertex7, startTime: DateTime(2023));
 
-    
-    PathSearchResult pathSearchResult = bfs.search(transitSearchRequest);
-    
-    for (TransitEdgeResult edgeResult in pathSearchResult.path) {
-      print('Edge: ${edgeResult.transitEdge.sourceVertex.name} -> ${edgeResult.transitEdge.targetVertex.name} | Time: ${edgeResult.fullEdgeTime}');
+    PathfinderResult pathSearchResult = bfs.searchPath();
+
+    for (EdgeDetails edgeDetails in pathSearchResult.path) {
+      print('Edge: ${edgeDetails.transitEdge.sourceVertex.name} -> ${edgeDetails.transitEdge.targetVertex.name} | Time: ${edgeDetails.fullTime}');
     }
     print('-------------------');
     print(pathSearchResult.visitedStopsHistory.map((StopVertex e) => e.name));
   });
 
   test('', () {
-    Bfs bfs = Bfs();
-    TransitSearchRequest transitSearchRequest = TransitSearchRequest(stopsGraph: stopsGraph, sourceVertex: vertex1, targetVertex: vertex9, startTime: 0);
+    Bfs bfs = Bfs(stopsGraph: stopsGraph, sourceVertex: vertex1, targetVertex: vertex9, startTime: DateTime(2023));
+
     expect(
-      () => bfs.search(transitSearchRequest),
+      () => bfs.searchPath(),
       throwsA(isA<Exception>()),
     );
   });

@@ -20,7 +20,7 @@ class DirectedGraph<V extends Vertex, E extends Edge<V>> {
     vehicleEdges.forEach(addEdge);
   }
 
-  List<E>? operator [](V vertex) => adjacencyList[vertex];
+  List<E> operator [](V vertex) => adjacencyList[vertex] ?? <E>[];
 
   List<V> get keys => adjacencyList.keys.toList();
 

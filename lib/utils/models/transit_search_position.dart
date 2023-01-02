@@ -1,13 +1,15 @@
-import 'package:path_finder/utils/models/edge_result.dart';
+import 'package:path_finder/utils/models/edge_details.dart';
 
 class TransitSearchPosition {
-  final TransitEdgeResult? previousTransitEdgeResult;
+  final EdgeDetails? previousEdge;
   final double totalTimeFromStart;
+  final double totalCostFromStart;
 
   TransitSearchPosition({
     required this.totalTimeFromStart,
-    this.previousTransitEdgeResult,
+    required this.totalCostFromStart,
+    this.previousEdge,
   });
   
-  bool get isFirstEdge =>  previousTransitEdgeResult == null;
+  bool get isFirstEdge =>  previousEdge == null;
 }

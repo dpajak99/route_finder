@@ -2,24 +2,22 @@ import 'package:path_finder/config/locator.dart';
 import 'package:path_finder/listeners/edge_cost_config/edge_cost_config.dart';
 import 'package:path_finder/utils/algorithms/haversine.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
-import 'package:path_finder/utils/models/edge/walk_edge.dart';
 import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class VehicleEdge extends TransitEdge {
-  final String _trackId;
+  final String trackId;
   final int _timeFromNow;
   final int _timeToNextStop;
   final double _distance;
 
   VehicleEdge({
+    required this.trackId,
     required StopVertex sourceVertex,
     required StopVertex targetVertex,
-    required String trackId,
     required int timeFromNow,
     required int timeToNextStop,
   })  : _distance = Haversine.calcDistanceInMeters(sourceVertex, targetVertex),
-        _trackId = trackId,
         _timeFromNow = timeFromNow,
         _timeToNextStop = timeToNextStop, 
         super(
@@ -32,17 +30,28 @@ class VehicleEdge extends TransitEdge {
   
   @override
   FullEdgeTime calcTime(TransitSearchPosition transitSearchPosition) {
+    if( transitSearchPosition.isFirstEdge ) {
+      return FullEdgeTime(
+        waitingTime: _timeFromNow.toDouble(),
+        transitTime: _timeToNextStop.toDouble(),
+      );
+    }
     double waitingTime = _timeFromNow - transitSearchPosition.totalTimeFromStart;
+    TransitEdge? previousTransitEdge = transitSearchPosition.previousEdge?.transitEdge;
+    bool isTransfer = previousTransitEdge is VehicleEdge && trackId != previousTransitEdge.trackId;
+    if(isTransfer) {
+      waitingTime += 4;
+    }
     return FullEdgeTime(transitTime: _timeToNextStop.toDouble(), waitingTime: waitingTime);
   }
   
   @override
   double calcCost(TransitSearchPosition transitSearchPosition) {
     EdgeCostConfig edgeCostConfig = getIt<EdgeCostConfig>();
-    TransitEdge? previousTransitEdge = transitSearchPosition.previousTransitEdgeResult?.transitEdge;
+    TransitEdge? previousTransitEdge = transitSearchPosition.previousEdge?.transitEdge;
 
     FullEdgeTime fullEdgeTime = calcTime(transitSearchPosition);
-    bool isTransfer = previousTransitEdge is VehicleEdge && _trackId != previousTransitEdge._trackId;
+    bool isTransfer = previousTransitEdge is VehicleEdge && trackId != previousTransitEdge.trackId;
 
     double specificEdgeCost = edgeCostConfig.vehicleEdgeCostTable.calcCost(
       fullEdgeTime: fullEdgeTime,
@@ -59,7 +68,7 @@ class VehicleEdge extends TransitEdge {
     if (transitSearchPosition.isFirstEdge) {
       return true;
     }
-    return transitSearchPosition.previousTransitEdgeResult!.edgeTimeEnd <= _timeFromNow;
+    return transitSearchPosition.previousEdge!.edgeTimeEnd <= _timeFromNow;
   }
   
 
@@ -72,10 +81,10 @@ class VehicleEdge extends TransitEdge {
   
   @override
   String toString() {
-    return 'BUS: From: ${sourceVertex.name}, To: ${targetVertex.name}, Time from now: ${getTimeAsString(_timeFromNow)} Track: $_trackId';
+    return 'BUS: From: ${sourceVertex.name}, To: ${targetVertex.name}, Time from now: ${getTimeAsString(_timeFromNow)} Track: $trackId';
   }
 
   @override
-  List<Object?> get props => <Object?>[sourceVertex, targetVertex, _trackId, _timeFromNow, _timeToNextStop];
+  List<Object?> get props => <Object?>[sourceVertex, targetVertex, trackId, _timeFromNow, _timeToNextStop];
 
 }
