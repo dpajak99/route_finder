@@ -1,5 +1,5 @@
-import 'package:path_finder/utils/algorithms/pathfinder_algorithm.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
+import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
 import 'package:path_finder/utils/models/graph/stops_graph.dart';
 import 'package:path_finder/utils/models/pathfinder_result.dart';
@@ -7,82 +7,94 @@ import 'package:path_finder/utils/models/queue/priority_queue.dart';
 import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
-class Dijkstra extends PathfinderAlgorithm<PriorityQueue<StopVertex>> {
+class Dijkstra {
+  final StopsGraph stopsGraph;
+  final StopVertex sourceVertex;
+  final StopVertex targetVertex;
+  final DateTime startTime;
+
   Dijkstra({
-    required StopsGraph stopsGraph,
-    required StopVertex sourceVertex,
-    required StopVertex targetVertex,
-    required DateTime startTime,
-  }) : super(
-    stopsGraph: stopsGraph,
-    sourceVertex: sourceVertex,
-    targetVertex: targetVertex,
-    startTime: startTime,
-    unvisitedStopsQueue: PriorityQueue<StopVertex>(),
-  );
-  
+    required this.stopsGraph,
+    required this.sourceVertex,
+    required this.targetVertex,
+    required this.startTime,
+  });
+
   @override
   PathfinderResult searchPath() {
-    clear();
+    Map<StopVertex, double> costs = <StopVertex, double>{};
+    Map<StopVertex, double> times = <StopVertex, double>{};
+    Map<StopVertex, EdgeDetails> previous = <StopVertex, EdgeDetails>{};
 
+    PriorityQueue<StopVertex> queue = PriorityQueue<StopVertex>();
+    queue.add(sourceVertex, 0);
     times[sourceVertex] = 0;
     costs[sourceVertex] = 0;
-    unvisitedStopsQueue.add(sourceVertex, 0);
 
-    while (unvisitedStopsQueue.isNotEmpty) {
-      PriorityQueueElement<StopVertex> currentQueueElement = unvisitedStopsQueue.pop();
-      StopVertex currentStopVertex = currentQueueElement.value;
-      
-      TransitSearchPosition transitSearchPosition = TransitSearchPosition(
-        totalTimeFromStart: times[currentStopVertex] ?? 0,
-        totalCostFromStart: costs[currentStopVertex] ?? 0,
-        previousEdge: visitedEdgesHistory[currentStopVertex],
-      );
+    while (queue.isNotEmpty) {
+      StopVertex currentVertex = queue.pop().value;
 
-      // If target vertex is found, we can stop searching
-      if (currentStopVertex == targetVertex) {
+      if (currentVertex == targetVertex) {
         break;
       }
 
-      List<TransitEdge> neighbors = stopsGraph[currentStopVertex];
+      for (StopVertex nextStopVertex in stopsGraph[currentVertex].keys) {
+        for (TransitEdge nextTransit in stopsGraph[currentVertex][nextStopVertex]!) {
+          TransitSearchPosition transitSearchPosition = TransitSearchPosition(
+            totalTimeFromStart: times[currentVertex]!,
+            totalCostFromStart: costs[currentVertex]!,
+            previousEdge: previous[currentVertex],
+          );
+          
+          bool isTransitAvailable = nextTransit.canReachEdge(transitSearchPosition);
+          if (isTransitAvailable == false) {
+            continue;
+          }
+          double newTime = costs[currentVertex]! + nextTransit.calcTime(transitSearchPosition).total;
+          double newCost = costs[currentVertex]! + nextTransit.calcCost(transitSearchPosition);
 
-      for (TransitEdge neighborEdge in neighbors) {
-        bool isTransitAvailable = neighborEdge.canReachEdge(transitSearchPosition);
-        if (isTransitAvailable == false) {
-          continue;
-        }
-        
-        StopVertex neighborVertex = neighborEdge.targetVertex;
-        EdgeDetails edgeDetails = EdgeDetails.calcEdgeDetails(neighborEdge: neighborEdge, transitSearchPosition: transitSearchPosition);
+          EdgeDetails edgeDetails = EdgeDetails.calcEdgeDetails(neighborEdge: nextTransit, transitSearchPosition: transitSearchPosition);
 
-        double previousTotalCostWithNeighbor = costs[neighborVertex] ?? double.infinity;
-        bool hasBetterCost = edgeDetails.costFromStartToReachNeighbor < previousTotalCostWithNeighbor;
-        bool firstNeighborVisit = costs[neighborVertex] == null;
-
-        if (firstNeighborVisit || hasBetterCost) {
-          // Update the previous vertex for the selected vertex
-          visitedEdgesHistory[neighborVertex] = edgeDetails;
-
-          // Update the distance and cost from the start vertex for the selected vertex
-          times[neighborVertex] = edgeDetails.timeFromStartToReachNeighbor;
-          costs[neighborVertex] = edgeDetails.costFromStartToReachNeighbor;
-
-          unvisitedStopsQueue.add(neighborVertex, edgeDetails.costFromStartToReachNeighbor);
+          if (!costs.containsKey(nextStopVertex) || newCost < costs[nextStopVertex]!) {
+            costs[nextStopVertex] = newCost;
+            times[nextStopVertex] = newTime;
+            previous[nextStopVertex] = edgeDetails;
+            queue.add(nextStopVertex, newCost);
+          }
         }
       }
     }
 
-    if (!visitedEdgesHistory.containsKey(targetVertex)) {
-      throw Exception('Cannot find path from ${sourceVertex.id} to ${targetVertex.id}');
-    }
-
-    List<EdgeDetails> path = buildPath();
+    List<EdgeDetails> path = buildPath(previous);
     printPath(path);
 
     return PathfinderResult(
       initialTime: startTime,
       path: path,
-      visitedStopsHistory: visitedStopsHistory,
+      visitedStopsHistory: List<StopVertex>.empty(growable: true),
     );
+  }
+
+  List<EdgeDetails> buildPath(Map<StopVertex, EdgeDetails> previous) {
+    // List to store the vertices in the shortest path
+    List<EdgeDetails> path = <EdgeDetails>[];
+
+    // Start from the end vertex and follow the previous pointers
+    // back to the start vertex, adding each visited vertex to the list
+
+    StopVertex currentVertex = targetVertex;
+    while (currentVertex != sourceVertex) {
+      EdgeDetails currentEdgeDetails = previous[currentVertex]!;
+      path.add(currentEdgeDetails);
+      currentVertex = currentEdgeDetails.transitEdge.sourceVertex;
+    }
+
+    return path.reversed.toList();
+  }
+
+  void printPath(List<EdgeDetails> path) {
+    for (EdgeDetails edgeDetails in path) {
+      print(edgeDetails);
+    }
   }
 }
