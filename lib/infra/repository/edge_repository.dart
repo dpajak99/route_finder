@@ -7,7 +7,7 @@ class EdgeRepository {
 
   Future<List<VehicleEdgeDto>> getAllVehicleEdges(int minutes) async {
     List<Map<String, Map<String, dynamic>>> result = await sql.mappedResultsQuery(
-      'select d.time_in_min, d.time_in_min - $minutes as "time_from_now", d.time_to_next_stop_in_min, d.track_id, d.bus_stop_id as "from", d.next_stop_id as "to" from schedule.departures d join schedule.tracks t on t.id = d.track_id join schedule.routes r on r.id = t.route_id join schedule.bus_lines bl on bl.id = r.bus_line_id where bl.version_id = 10 and d.next_stop_id is not null and d.time_in_min > $minutes',
+      'select bl.name as "bus_name", d.time_in_min, d.time_in_min - $minutes as "time_from_now", d.time_to_next_stop_in_min, d.track_id, d.bus_stop_id as "from", d.next_stop_id as "to" from schedule.departures d join schedule.tracks t on t.id = d.track_id join schedule.routes r on r.id = t.route_id join schedule.bus_lines bl on bl.id = r.bus_line_id where d.next_stop_id is not null and d.time_in_min > $minutes and bl.id NOT IN(152,164,165,166)',
     );
     return result.map((Map<String, Map<String, dynamic>> fullRow) {
       return VehicleEdgeDto.fromJson(mergeMaps(fullRow.values.toList()));

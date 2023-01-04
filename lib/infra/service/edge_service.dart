@@ -18,7 +18,9 @@ class EdgeService {
       vehicleEdgeModelList.add(VehicleEdge(
         sourceVertex: fromStopVertex,
         targetVertex: toStopVertex,
+        departureTime: vehicleEdgeDto.timeInMin,
         trackId: vehicleEdgeDto.trackId,
+        busName: vehicleEdgeDto.busName,
         timeFromNow: vehicleEdgeDto.timeFromNow,
         timeToNextStop: vehicleEdgeDto.timeToNextStop,
       ));

@@ -4,11 +4,15 @@ import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class VehicleEdge extends TransitEdge {
   final String trackId;
+  final String busName;
+  final int departureTime;
   final int _timeFromNow;
   final int _timeToNextStop;
 
   const VehicleEdge({
     required this.trackId,
+    required this.busName,
+    required this.departureTime,
     required StopVertex sourceVertex,
     required StopVertex targetVertex,
     required int timeFromNow,

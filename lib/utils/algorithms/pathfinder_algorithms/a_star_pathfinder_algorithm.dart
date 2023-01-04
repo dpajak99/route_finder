@@ -1,10 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:path_finder/utils/algorithms/haversine.dart';
 import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_algoritm_result.dart';
 import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_search_request.dart';
 import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_algorithm.dart';
 import 'package:path_finder/utils/exception/no_route_exception.dart';
-import 'package:path_finder/utils/exception/timeout_exception.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
 import 'package:path_finder/utils/models/graph/stops_graph.dart';
@@ -22,100 +20,96 @@ class AStarPathfinderAlgorithm extends PathfinderAlgorithm {
 
   @override
   Future<PathfinderAlgorithmResult> runSearch(PathfinderSearchRequest pathfinderSearchRequest) async {
-    PathfinderAlgorithmResult pathfinderAlgorithmResult = await compute(_thread, pathfinderSearchRequest);
-    return pathfinderAlgorithmResult;
-  }
-}
+    StopsGraph stopsGraph = pathfinderSearchRequest.stopsGraph;
+    StopVertex sourceVertex = pathfinderSearchRequest.sourceVertex;
+    StopVertex targetVertex = pathfinderSearchRequest.targetVertex;
+    Duration timeout = pathfinderSearchRequest.timeout;
 
-PathfinderAlgorithmResult _thread(PathfinderSearchRequest pathfinderSearchRequest) {
-  StopsGraph stopsGraph = pathfinderSearchRequest.stopsGraph;
-  StopVertex sourceVertex = pathfinderSearchRequest.sourceVertex;
-  StopVertex targetVertex = pathfinderSearchRequest.targetVertex;
-  Duration timeout = pathfinderSearchRequest.timeout;
-  
-  DateTime algorithmStartTime = DateTime.now();
-  int visitedStopsCount = 0;
+    DateTime algorithmStartTime = DateTime.now();
+    int visitedStopsCount = 0;
 
-  Map<StopVertex, double> costs = <StopVertex, double>{};
-  Map<StopVertex, double> times = <StopVertex, double>{};
-  Map<StopVertex, EdgeDetails> previous = <StopVertex, EdgeDetails>{};
+    Map<StopVertex, double> costs = <StopVertex, double>{};
+    Map<StopVertex, double> times = <StopVertex, double>{};
+    Map<StopVertex, EdgeDetails> previous = <StopVertex, EdgeDetails>{};
 
-  List<StopVertex> visitedStops = List<StopVertex>.empty(growable: true);
+    List<StopVertex> visitedStops = List<StopVertex>.empty(growable: true);
 
-  PriorityQueue<StopVertex> queue = PriorityQueue<StopVertex>();
-  queue.add(sourceVertex, 0);
-  times[sourceVertex] = 0;
-  costs[sourceVertex] = 0;
+    PriorityQueue<StopVertex> queue = PriorityQueue<StopVertex>();
+    queue.add(sourceVertex, 0);
+    times[sourceVertex] = 0;
+    costs[sourceVertex] = 0;
 
-  while (queue.isNotEmpty) {
-    StopVertex currentVertex = queue.pop().value;
-    visitedStops.add(currentVertex);
-    visitedStopsCount++;
+    while (queue.isNotEmpty) {
+      StopVertex currentVertex = queue.pop().value;
+      visitedStops.add(currentVertex);
+      visitedStopsCount++;
 
 
-    // Terminate based on timeout. We don't check the termination on every round, as it is
-    // expensive to fetch the current time, compared to just running one more round.
-    if (visitedStopsCount % 100 == 0 && algorithmStartTime.difference(DateTime.now()).abs() > timeout) {
-      throw TimeoutException();
-    }
+      // Terminate based on timeout. We don't check the termination on every round, as it is
+      // expensive to fetch the current time, compared to just running one more round.
+      // if (visitedStopsCount % 100 == 0 && algorithmStartTime.difference(DateTime.now()).abs() > timeout) {
+      //   throw TimeoutException();
+      // }
 
-    if (currentVertex == targetVertex) {
-      break;
-    }
+      if (currentVertex == targetVertex) {
+        break;
+      }
 
-    for (StopVertex neighborVertex in stopsGraph[currentVertex].keys) {
-      for (TransitEdge transitEdge in stopsGraph[currentVertex][neighborVertex]!) {
-        TransitSearchPosition transitSearchPosition = TransitSearchPosition(
-          walkEdgeCostTable: pathfinderSearchRequest.walkEdgeCostTable,
-          vehicleEdgeCostTable: pathfinderSearchRequest.vehicleEdgeCostTable,
-          totalTimeFromStart: times[currentVertex]!,
-          totalCostFromStart: costs[currentVertex]!,
-          previousEdge: previous[currentVertex],
-        );
+      for (StopVertex neighborVertex in stopsGraph[currentVertex].keys) {
+        for (TransitEdge transitEdge in stopsGraph[currentVertex][neighborVertex]!) {
+          TransitSearchPosition transitSearchPosition = TransitSearchPosition(
+            walkEdgeCostTable: pathfinderSearchRequest.walkEdgeCostTable,
+            vehicleEdgeCostTable: pathfinderSearchRequest.vehicleEdgeCostTable,
+            totalTimeFromStart: times[currentVertex]!,
+            totalCostFromStart: costs[currentVertex]!,
+            previousEdge: previous[currentVertex],
+          );
 
-        bool isTransitAvailable = transitEdge.canReachEdge(transitSearchPosition);
-        if (isTransitAvailable == false) {
-          continue;
-        }
+          bool isTransitAvailable = transitEdge.canReachEdge(transitSearchPosition);
+          if (isTransitAvailable == false) {
+            continue;
+          }
 
-        double heuristicCost = _calcHeuristicCost(neighborVertex, targetVertex) * 0.0005;
+          double heuristicCost = _calcHeuristicCost(neighborVertex, targetVertex) * 0.0001;
 
-        EdgeDetails edgeDetails = EdgeDetails.calcEdgeDetails(
-          neighborEdge: transitEdge,
-          transitSearchPosition: transitSearchPosition,
-          heuristicCost: heuristicCost,
-        );
+          EdgeDetails edgeDetails = EdgeDetails.calcEdgeDetails(
+            neighborEdge: transitEdge,
+            transitSearchPosition: transitSearchPosition,
+            heuristicCost: heuristicCost,
+          );
 
-        double newTime = edgeDetails.timeFromStartToReachNeighbor;
-        double newCost = edgeDetails.costFromStartToReachNeighbor;
+          double newTime = edgeDetails.timeFromStartToReachNeighbor;
+          double newCost = edgeDetails.costFromStartToReachNeighbor;
 
-        double previousCost = costs[neighborVertex] ?? double.infinity;
+          double previousCost = costs[neighborVertex] ?? double.infinity;
 
-        bool firstNeighborVisit = costs.containsKey(neighborVertex) == false;
-        bool hasBetterCost = newCost < previousCost;
-        if (firstNeighborVisit || hasBetterCost) {
-          costs[neighborVertex] = newCost;
-          times[neighborVertex] = newTime;
-          previous[neighborVertex] = edgeDetails;
-          queue.add(neighborVertex, newCost);
+          bool firstNeighborVisit = costs.containsKey(neighborVertex) == false;
+          bool hasBetterCost = newCost < previousCost;
+          if (firstNeighborVisit || hasBetterCost) {
+            costs[neighborVertex] = newCost;
+            times[neighborVertex] = newTime;
+            previous[neighborVertex] = edgeDetails;
+            queue.add(neighborVertex, newCost);
+          }
         }
       }
     }
-  }
 
-  if(previous.containsKey(targetVertex) == false) {
-    throw NoRouteException();
-  }
+    if(previous.containsKey(targetVertex) == false) {
+      throw NoRouteException();
+    }
 
-  return PathfinderAlgorithmResult(
-    algorithmStartTime: algorithmStartTime,
-    algorithmEndTime: DateTime.now(),
-    visitedStopsCount: visitedStopsCount,
-    previous: previous,
-    visitedStopsHistory: visitedStops,
-  );
+    return PathfinderAlgorithmResult(
+      algorithmStartTime: algorithmStartTime,
+      algorithmEndTime: DateTime.now(),
+      visitedStopsCount: visitedStopsCount,
+      previous: previous,
+      visitedStopsHistory: visitedStops,
+    );
+  }
+  
+  double _calcHeuristicCost(StopVertex stopVertex, StopVertex targetVertex) {
+    return Haversine.calcDistanceInMeters(stopVertex, targetVertex);
+  }
 }
 
-double _calcHeuristicCost(StopVertex stopVertex, StopVertex targetVertex) {
-  return Haversine.calcDistanceInMeters(stopVertex, targetVertex);
-}

@@ -1,4 +1,5 @@
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
+import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
 import 'package:path_finder/utils/models/transit_search_position.dart';
 
 class EdgeDetails {
@@ -41,6 +42,14 @@ class EdgeDetails {
   double get edgeTimeStart => transitSearchPosition.totalTimeFromStart;
 
   double get edgeTimeEnd => transitSearchPosition.totalTimeFromStart + fullTime.total;
+  
+  int get departureTime {
+    if( transitEdge is VehicleEdge ) {
+      return (transitEdge as VehicleEdge).departureTime;
+    } else {
+      return timeFromStartToReachNeighbor.toInt();
+    }
+  }
 
   @override
   String toString() {

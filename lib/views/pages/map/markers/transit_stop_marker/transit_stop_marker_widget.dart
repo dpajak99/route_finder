@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:jdenticon_dart/jdenticon_dart.dart';
+import 'package:path_finder/utils/models/edge/transit_edge.dart';
+import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
@@ -16,24 +20,82 @@ class TransitStopMarkerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       width: 300,
       height: 150,
+      padding: const EdgeInsets.all(8),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+        border: Border.fromBorderSide(BorderSide(color: Colors.black)),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Container(
-            color: Colors.white,
-            child: Text(stopVertex.name.toString()),
+          Row(
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  Icon(
+                    edgeDetails.transitEdge is VehicleEdge ? Icons.directions_bus_filled : Icons.directions_walk,
+                    size: 20,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  if (edgeDetails.transitEdge is VehicleEdge)
+                    Text(
+                      (edgeDetails.transitEdge as VehicleEdge).busName,
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                ],
+              ),
+              if (edgeDetails.transitEdge is VehicleEdge) ...<Widget>[
+                const SizedBox(width: 10),
+                SizedBox(
+                  width: 25,
+                  height: 25,
+                  child: SvgPicture.string(
+                    Jdenticon.toSvg((edgeDetails.transitEdge as VehicleEdge).trackId),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ],
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  stopVertex.name.toString(),
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
           ),
-          Container(
-            color: Colors.white,
-            child: Text(edgeDetails.cost.toString()),
-          ),
-          Container(
-            color: Colors.white,
-            child: Text('${minutesToString(time)} (${edgeDetails.fullTime.waitingTime})'),
+          const SizedBox(height: 8),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Column(
+                  children: <Widget>[
+                    const SizedBox(width: double.infinity, child: Text('Edge cost:', overflow: TextOverflow.ellipsis)),
+                    if (edgeDetails.transitEdge is VehicleEdge)
+                      const SizedBox(width: double.infinity, child: Text('Departure time:', overflow: TextOverflow.ellipsis)),
+                    const SizedBox(width: double.infinity, child: Text('Waiting time:', overflow: TextOverflow.ellipsis)),
+                    const SizedBox(width: double.infinity, child: Text('Trip time:', overflow: TextOverflow.ellipsis)),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  children: <Widget>[
+                    SizedBox(width: double.infinity, child: Text(edgeDetails.cost.toString(), overflow: TextOverflow.ellipsis)),
+                    if (edgeDetails.transitEdge is VehicleEdge)
+                      SizedBox(width: double.infinity, child: Text(minutesToString(edgeDetails.departureTime), overflow: TextOverflow.ellipsis)),
+                    SizedBox(width: double.infinity, child: Text(minutesToString(edgeDetails.fullTime.waitingTime), overflow: TextOverflow.ellipsis)),
+                    SizedBox(width: double.infinity, child: Text(minutesToString(time), overflow: TextOverflow.ellipsis)),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -41,7 +103,7 @@ class TransitStopMarkerWidget extends StatelessWidget {
   }
 
   double get time {
-    if(isLast) {
+    if (isLast) {
       return edgeDetails.edgeTimeEnd;
     } else {
       return edgeDetails.edgeTimeStart;

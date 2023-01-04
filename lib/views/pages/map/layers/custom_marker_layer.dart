@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 import 'package:path_finder/bloc/map/map_markers_cubit/map_markers_cubit.dart';
 import 'package:path_finder/bloc/map/map_markers_cubit/map_markers_state.dart';
@@ -18,22 +19,26 @@ class CustomMarkerLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final StopSelectCubit stopSelectCubit = getIt<StopSelectCubit>();
-
+ 
     return BlocBuilder<MapMarkersCubit, MapMarkersState>(
       bloc: mapMarkersCubit,
       builder: (BuildContext context, MapMarkersState mapMarkersState) {
-        return PopupMarkerLayerWidget(
-          options: PopupMarkerLayerOptions(
-            markerTapBehavior: MarkerTapBehavior.custom((Marker marker, PopupState popupState, PopupController popupController) {
-              StopMarker stopMarker = marker as StopMarker;
-              stopSelectCubit.updateSelectedVertex(stopMarker.stopVertex);
-            }),
-            popupBuilder: (BuildContext context, Marker marker) => Container(
-              color: Colors.white,
-              child: Text((marker as StopMarker).stopVertex.name.toString()),
+        return MarkerClusterLayerWidget(
+          options: MarkerClusterLayerOptions(
+            maxClusterRadius: 120,
+            disableClusteringAtZoom: 13,
+            size: const Size(40, 40),
+            fitBoundsOptions: const FitBoundsOptions(
+              padding: EdgeInsets.all(50),
             ),
             markers: mapMarkersState.markers,
+            polygonOptions: const PolygonOptions(borderColor: Colors.transparent, color: Colors.transparent, borderStrokeWidth: 1),
+            builder: (BuildContext context, List<Marker> markers) {
+              return FloatingActionButton(
+                onPressed: null,
+                child: Text(markers.length.toString()),
+              );
+            },
           ),
         );
       },

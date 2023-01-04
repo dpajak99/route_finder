@@ -5,13 +5,11 @@ enum StopActiveSelection { source, target, none }
 
 class StopSelectState extends Equatable {
   final StopActiveSelection stopActiveSelection;
-  final DateTime dateTime;
   final StopVertex? sourceVertex;
   final StopVertex? targetVertex;
 
   const StopSelectState({
     required this.stopActiveSelection,
-    required this.dateTime,
     this.sourceVertex,
     this.targetVertex,
   });
@@ -24,7 +22,6 @@ class StopSelectState extends Equatable {
   }) {
     return StopSelectState(
       stopActiveSelection: stopActiveSelection ?? this.stopActiveSelection,
-      dateTime: dateTime ?? this.dateTime,
       sourceVertex: sourceVertex ?? this.sourceVertex,
       targetVertex: targetVertex ?? this.targetVertex,
     );
@@ -33,5 +30,5 @@ class StopSelectState extends Equatable {
   bool get isComplete => sourceVertex != null && targetVertex != null;
 
   @override
-  List<Object?> get props => <Object?>[stopActiveSelection, dateTime, sourceVertex, targetVertex];
+  List<Object?> get props => <Object?>[stopActiveSelection,  sourceVertex, targetVertex];
 }
