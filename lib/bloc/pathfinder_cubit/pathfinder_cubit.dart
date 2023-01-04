@@ -5,13 +5,15 @@ import 'package:path_finder/bloc/pathfinder_settings_cubit/pathfinder_settings_c
 import 'package:path_finder/config/locator.dart';
 import 'package:path_finder/infra/service/edge_service.dart';
 import 'package:path_finder/infra/service/stop_service.dart';
-import 'package:path_finder/utils/algorithms/a_star.dart';
-import 'package:path_finder/utils/algorithms/algorithm_type.dart';
-import 'package:path_finder/utils/algorithms/dijkstra.dart';
-import 'package:path_finder/utils/algorithms/pathfinder_algorithm.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/a_star_pathfinder_algorithm.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/algorithm_type.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/bfs_pathfinder_algorithm.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/dfs_pathfinder_algorithm.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/dijkstra_pathfinder_algorithm.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_algorithm.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_result.dart';
 import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
 import 'package:path_finder/utils/models/graph/stops_graph.dart';
-import 'package:path_finder/utils/models/pathfinder_result.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class PathFinderCubit extends Cubit<PathfinderState> {
@@ -48,7 +50,7 @@ class PathFinderCubit extends Cubit<PathfinderState> {
     PathfinderAlgorithm pathfinderAlgorithm;
     switch (pathfinderSettingsCubit.state.algorithmType) {
       case AlgorithmType.dijkstra:
-        pathfinderAlgorithm = Dijkstra(
+        pathfinderAlgorithm = DijkstraPathfinderAlgorithm(
             stopsGraph: stopsGraph, 
             sourceVertex: pathfinderSettingsCubit.state.sourceVertex!,
             targetVertex: pathfinderSettingsCubit.state.targetVertex!,
@@ -56,7 +58,23 @@ class PathFinderCubit extends Cubit<PathfinderState> {
         );
         break;
       case AlgorithmType.aStar:
-        pathfinderAlgorithm = AStar(
+        pathfinderAlgorithm = AStarPathfinderAlgorithm(
+          stopsGraph: stopsGraph,
+          sourceVertex: pathfinderSettingsCubit.state.sourceVertex!,
+          targetVertex: pathfinderSettingsCubit.state.targetVertex!,
+          startTime: pathfinderSettingsCubit.state.searchDateTime,
+        );
+        break;
+      case AlgorithmType.dfs:
+        pathfinderAlgorithm = DfsPathfinderAlgorithm(
+          stopsGraph: stopsGraph,
+          sourceVertex: pathfinderSettingsCubit.state.sourceVertex!,
+          targetVertex: pathfinderSettingsCubit.state.targetVertex!,
+          startTime: pathfinderSettingsCubit.state.searchDateTime,
+        );
+        break;
+      case AlgorithmType.bfs:
+        pathfinderAlgorithm = BfsPathfinderAlgorithm(
           stopsGraph: stopsGraph,
           sourceVertex: pathfinderSettingsCubit.state.sourceVertex!,
           targetVertex: pathfinderSettingsCubit.state.targetVertex!,

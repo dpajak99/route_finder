@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_finder/config/locator.dart';
-import 'package:path_finder/utils/algorithms/dfs.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/dfs_pathfinder_algorithm.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_result.dart';
 import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
 import 'package:path_finder/utils/models/graph/stops_graph.dart';
-import 'package:path_finder/utils/models/pathfinder_result.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 void main() {
@@ -47,11 +47,11 @@ void main() {
   stopsGraph.addEdge(VehicleEdge(sourceVertex: vertex5, targetVertex: vertex10, trackId: '1', timeFromNow: 3, timeToNextStop: 1));
   stopsGraph.addEdge(VehicleEdge(sourceVertex: vertex6, targetVertex: vertex11, trackId: '1', timeFromNow: 3, timeToNextStop: 1));
 
-  test('', () {
-    Dfs dfs = Dfs(stopsGraph: stopsGraph, sourceVertex: vertex1, targetVertex: vertex7, startTime: DateTime(2023));
+  test('', () async {
+    DfsPathfinderAlgorithm dfs = DfsPathfinderAlgorithm(stopsGraph: stopsGraph, sourceVertex: vertex1, targetVertex: vertex7, startTime: DateTime(2023));
 
     
-    PathfinderResult pathSearchResult = dfs.searchPath();
+    PathfinderResult pathSearchResult = await dfs.searchPath();
     
     for (EdgeDetails edgeDetails in pathSearchResult.path) {
       print('Edge: ${edgeDetails.transitEdge.sourceVertex.name} -> ${edgeDetails.transitEdge.targetVertex.name} | Time: ${edgeDetails.fullTime}');
@@ -61,7 +61,7 @@ void main() {
   });
 
   test('', () {
-    Dfs dfs = Dfs(stopsGraph: stopsGraph, sourceVertex: vertex1, targetVertex: vertex9, startTime: DateTime(2023));
+    DfsPathfinderAlgorithm dfs = DfsPathfinderAlgorithm(stopsGraph: stopsGraph, sourceVertex: vertex1, targetVertex: vertex9, startTime: DateTime(2023));
     expect(
       () => dfs.searchPath(),
       throwsA(isA<Exception>()),

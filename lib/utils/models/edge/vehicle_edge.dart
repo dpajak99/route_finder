@@ -1,13 +1,10 @@
-import 'package:path_finder/bloc/pathfinder_settings_cubit/pathfinder_settings_cubit.dart';
 import 'package:path_finder/bloc/pathfinder_settings_cubit/pathfinder_settings_state.dart';
-import 'package:path_finder/config/locator.dart';
 import 'package:path_finder/utils/algorithms/haversine.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class VehicleEdge extends TransitEdge {
-  final PathfinderSettingsCubit pathfinderSettingsCubit = getIt<PathfinderSettingsCubit>();
   final String trackId;
   final int _timeFromNow;
   final int _timeToNextStop;
@@ -44,13 +41,12 @@ class VehicleEdge extends TransitEdge {
   
   @override
   double calcCost(TransitSearchPosition transitSearchPosition) {
-    PathfinderSettingsState pathfinderSettingsState = pathfinderSettingsCubit.state;
     TransitEdge? previousTransitEdge = transitSearchPosition.previousEdge?.transitEdge;
 
     FullEdgeTime fullEdgeTime = calcTime(transitSearchPosition);
     bool isTransfer = previousTransitEdge is VehicleEdge && trackId != previousTransitEdge.trackId;
 
-    double specificEdgeCost = pathfinderSettingsState.vehicleEdgeCostTable.calcCost(
+    double specificEdgeCost = transitSearchPosition.vehicleEdgeCostTable.calcCost(
       fullEdgeTime: fullEdgeTime,
       isTransfer: isTransfer,
     );

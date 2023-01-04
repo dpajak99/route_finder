@@ -1,3 +1,4 @@
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_algoritm_result.dart';
 import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
 import 'package:path_finder/utils/models/edge/walk_edge.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
@@ -7,15 +8,30 @@ class PathfinderResult {
   final DateTime initialTime;
   final DateTime algorithmStartTime;
   final DateTime algorithmEndTime;
-  final int visitedVertexCount;
+  final int visitedStopsCount;
   final List<EdgeDetails> path;
   final List<StopVertex> visitedStopsHistory;
 
-  PathfinderResult({
+  factory PathfinderResult({
+    required PathfinderAlgorithmResult pathfinderAlgorithmResult,
+    required List<EdgeDetails> path,
+    required DateTime initialTime,
+  }) {
+    return PathfinderResult._(
+      initialTime: initialTime,
+      algorithmStartTime: pathfinderAlgorithmResult.algorithmStartTime,
+      algorithmEndTime: pathfinderAlgorithmResult.algorithmEndTime,
+      visitedStopsCount: pathfinderAlgorithmResult.visitedStopsCount,
+      path: path,
+      visitedStopsHistory: pathfinderAlgorithmResult.visitedStopsHistory,
+    );
+  }
+
+  PathfinderResult._({
     required this.initialTime,
     required this.algorithmStartTime,
     required this.algorithmEndTime,
-    required this.visitedVertexCount,
+    required this.visitedStopsCount,
     required this.path,
     required this.visitedStopsHistory,
   });
@@ -77,7 +93,7 @@ class PathfinderResult {
           stopVertex: edgeDetails.transitEdge.sourceVertex,
           waitTime: edgeDetails.fullTime.waitingTime.toInt(),
         ));
-        
+
         startTime = startTime.add(Duration(minutes: edgeDetails.fullTime.waitingTime.toInt()));
         story.add(EnterVehicleAction(
           stopVertex: edgeDetails.transitEdge.sourceVertex,
@@ -109,7 +125,7 @@ class StartAction extends PathfinderResultStoryAction {
     required this.sourceVertex,
     required this.startTime,
   });
-  
+
   @override
   String toString() {
     return 'StartAction{sourceVertex: ${sourceVertex.name}, startTime: $startTime}';
@@ -126,7 +142,7 @@ class ArrivalAction extends PathfinderResultStoryAction {
     required this.arrivalTime,
     required this.totalTime,
   });
-  
+
   @override
   String toString() {
     return 'ArrivalAction{targetVertex: ${targetVertex.name}, arrivalTime: $arrivalTime, totalTime: $totalTime}';
@@ -147,7 +163,7 @@ class WalkAction extends PathfinderResultStoryAction {
     required this.arrivalTime,
     required this.totalTime,
   });
-  
+
   @override
   String toString() {
     return 'WalkAction{sourceVertex: ${sourceVertex.name}, targetVertex: ${targetVertex.name}, startTime: $startTime, arrivalTime: $arrivalTime, totalTime: $totalTime}';
@@ -162,7 +178,7 @@ class LeaveVehicleAction extends PathfinderResultStoryAction {
     required this.stopVertex,
     required this.leaveTrackId,
   });
-  
+
   @override
   String toString() {
     return 'LeaveVehicleAction{stopVertex: ${stopVertex.name}, leaveTrackId: $leaveTrackId}';
@@ -185,7 +201,7 @@ class TripAction extends PathfinderResultStoryAction {
     required this.totalTime,
     required this.trackId,
   });
-  
+
   @override
   String toString() {
     return 'TripAction{sourceVertex: ${sourceVertex.name}, targetVertex: ${targetVertex.name}, startTime: $startTime, arrivalTime: $arrivalTime, totalTime: $totalTime, trackId: $trackId}';
@@ -200,7 +216,7 @@ class WaitAction extends PathfinderResultStoryAction {
     required this.stopVertex,
     required this.waitTime,
   });
-  
+
   @override
   String toString() {
     return 'WaitAction{stopVertex: ${stopVertex.name}, waitTime: $waitTime}';
@@ -217,7 +233,7 @@ class EnterVehicleAction extends PathfinderResultStoryAction {
     required this.trackId,
     required this.time,
   });
-  
+
   @override
   String toString() {
     return 'EnterVehicleAction{stopVertex: ${stopVertex.name}, trackId: $trackId, time: $time}';

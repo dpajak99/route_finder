@@ -1,12 +1,17 @@
 import 'package:flutter/foundation.dart';
+import 'package:path_finder/bloc/pathfinder_settings_cubit/pathfinder_settings_cubit.dart';
+import 'package:path_finder/config/locator.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_algoritm_result.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_result.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_search_request.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
 import 'package:path_finder/utils/models/graph/stops_graph.dart';
-import 'package:path_finder/utils/models/pathfinder_result.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 abstract class PathfinderAlgorithm {
   static const Duration _timeout = Duration(seconds: 5);
-  
+
+  final PathfinderSettingsCubit pathfinderSettingsCubit = getIt<PathfinderSettingsCubit>();
   final StopsGraph stopsGraph;
   final StopVertex sourceVertex;
   final StopVertex targetVertex;
@@ -20,12 +25,26 @@ abstract class PathfinderAlgorithm {
   });
 
   Future<PathfinderResult> searchPath() async {
-    PathfinderResult pathfinderResult = runSearch(_timeout);
+    PathfinderSearchRequest pathfinderSearchRequest = PathfinderSearchRequest(
+      vehicleEdgeCostTable: pathfinderSettingsCubit.state.vehicleEdgeCostTable,
+      walkEdgeCostTable: pathfinderSettingsCubit.state.walkEdgeCostTable,
+      timeout: _timeout,
+      stopsGraph: stopsGraph,
+      sourceVertex: sourceVertex,
+      targetVertex: targetVertex,
+      startTime: startTime,
+    );
+    PathfinderAlgorithmResult pathfinderAlgorithmResult = await runSearch(pathfinderSearchRequest);
+    PathfinderResult pathfinderResult = PathfinderResult(
+      pathfinderAlgorithmResult: pathfinderAlgorithmResult,
+      path: buildPath(pathfinderAlgorithmResult.previous),
+      initialTime: startTime,
+    );
     return pathfinderResult;
   }
 
   @protected
-  PathfinderResult runSearch(Duration timeout);
+  Future<PathfinderAlgorithmResult> runSearch(PathfinderSearchRequest pathfinderSearchRequest);
   
   @protected
   List<EdgeDetails> buildPath(Map<StopVertex, EdgeDetails> previous) {

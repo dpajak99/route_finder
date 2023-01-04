@@ -1,11 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_finder/config/locator.dart';
-import 'package:path_finder/utils/algorithms/dfs.dart';
-import 'package:path_finder/utils/algorithms/dijkstra.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/dijkstra_pathfinder_algorithm.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_result.dart';
 import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
 import 'package:path_finder/utils/models/graph/stops_graph.dart';
-import 'package:path_finder/utils/models/pathfinder_result.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 void main() {
@@ -45,11 +44,11 @@ void main() {
   stopsGraph.addEdge(VehicleEdge(sourceVertex: vertexE, targetVertex: vertexB, trackId: '1', timeFromNow: 7, timeToNextStop: 1));
 
 
-  test('', () {
-    Dijkstra dijkstra = Dijkstra(stopsGraph: stopsGraph, sourceVertex: vertexA, targetVertex: vertexF, startTime: DateTime(2023));
+  test('', () async {
+    DijkstraPathfinderAlgorithm dijkstra = DijkstraPathfinderAlgorithm(stopsGraph: stopsGraph, sourceVertex: vertexA, targetVertex: vertexF, startTime: DateTime(2023));
 
     
-    PathfinderResult pathSearchResult = dijkstra.searchPath();
+    PathfinderResult pathSearchResult = await dijkstra.searchPath();
     
     for (EdgeDetails edgeDetails in pathSearchResult.path) {
       print('Edge: ${edgeDetails.transitEdge.sourceVertex.name} -> ${edgeDetails.transitEdge.targetVertex.name} | Time: ${edgeDetails.fullTime}');
