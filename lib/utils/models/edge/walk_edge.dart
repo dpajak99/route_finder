@@ -1,11 +1,12 @@
+import 'package:path_finder/bloc/pathfinder_settings_cubit/pathfinder_settings_cubit.dart';
+import 'package:path_finder/bloc/pathfinder_settings_cubit/pathfinder_settings_state.dart';
 import 'package:path_finder/config/locator.dart';
-import 'package:path_finder/listeners/edge_cost_config/edge_cost_config.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class WalkEdge extends TransitEdge {
-  final EdgeCostConfig edgeCostConfig = getIt<EdgeCostConfig>();
+  final PathfinderSettingsState pathfinderSettingsState = getIt<PathfinderSettingsCubit>().state;
   final double distance;
 
   WalkEdge({
@@ -27,8 +28,7 @@ class WalkEdge extends TransitEdge {
   double calcCost(TransitSearchPosition transitSearchPosition) {
     FullEdgeTime fullEdgeTime = calcTime(transitSearchPosition);
     
-    double specificEdgeCost = edgeCostConfig.walkEdgeCostTable.calcCost(distance, fullEdgeTime.total);
-    // double globalEdgeCost = edgeCostConfig.transitEdgeCostTable.calcCost(fullEdgeTime.total, distance);
+    double specificEdgeCost = pathfinderSettingsState.walkEdgeCostTable.calcCost(distance, fullEdgeTime.total);
     
     return specificEdgeCost;
   }
@@ -42,7 +42,7 @@ class WalkEdge extends TransitEdge {
     return nextWalkEdgeInLine == false;
   }
   
-  double get _walkingTime => distance / edgeCostConfig.walkEdgeCostTable.speed;
+  double get _walkingTime => distance / pathfinderSettingsState.walkEdgeCostTable.speed;
 
   @override
   String toString() {

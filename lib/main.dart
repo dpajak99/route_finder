@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:path_finder/config/locator.dart';
 import 'package:path_finder/infra/postgres_database.dart';
-import 'package:path_finder/views/pages/demo_page.dart';
+import 'package:path_finder/views/pages/main/main_page.dart';
 
 Future<void> main() async {
   initLocator();
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const DemoPage(),
+      home: const MainPage(),
     );
   }
 }

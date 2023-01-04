@@ -5,11 +5,17 @@ import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class PathfinderResult {
   final DateTime initialTime;
+  final DateTime algorithmStartTime;
+  final DateTime algorithmEndTime;
+  final int visitedVertexCount;
   final List<EdgeDetails> path;
   final List<StopVertex> visitedStopsHistory;
 
   PathfinderResult({
     required this.initialTime,
+    required this.algorithmStartTime,
+    required this.algorithmEndTime,
+    required this.visitedVertexCount,
     required this.path,
     required this.visitedStopsHistory,
   });

@@ -1,11 +1,13 @@
+import 'package:path_finder/bloc/pathfinder_settings_cubit/pathfinder_settings_cubit.dart';
+import 'package:path_finder/bloc/pathfinder_settings_cubit/pathfinder_settings_state.dart';
 import 'package:path_finder/config/locator.dart';
-import 'package:path_finder/listeners/edge_cost_config/edge_cost_config.dart';
 import 'package:path_finder/utils/algorithms/haversine.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class VehicleEdge extends TransitEdge {
+  final PathfinderSettingsCubit pathfinderSettingsCubit = getIt<PathfinderSettingsCubit>();
   final String trackId;
   final int _timeFromNow;
   final int _timeToNextStop;
@@ -37,27 +39,21 @@ class VehicleEdge extends TransitEdge {
       );
     }
     double waitingTime = _timeFromNow - transitSearchPosition.totalTimeFromStart;
-    TransitEdge? previousTransitEdge = transitSearchPosition.previousEdge?.transitEdge;
-    bool isTransfer = previousTransitEdge is VehicleEdge && trackId != previousTransitEdge.trackId;
-    if(isTransfer) {
-      waitingTime += 4;
-    }
     return FullEdgeTime(transitTime: _timeToNextStop.toDouble(), waitingTime: waitingTime);
   }
   
   @override
   double calcCost(TransitSearchPosition transitSearchPosition) {
-    EdgeCostConfig edgeCostConfig = getIt<EdgeCostConfig>();
+    PathfinderSettingsState pathfinderSettingsState = pathfinderSettingsCubit.state;
     TransitEdge? previousTransitEdge = transitSearchPosition.previousEdge?.transitEdge;
 
     FullEdgeTime fullEdgeTime = calcTime(transitSearchPosition);
     bool isTransfer = previousTransitEdge is VehicleEdge && trackId != previousTransitEdge.trackId;
 
-    double specificEdgeCost = edgeCostConfig.vehicleEdgeCostTable.calcCost(
+    double specificEdgeCost = pathfinderSettingsState.vehicleEdgeCostTable.calcCost(
       fullEdgeTime: fullEdgeTime,
       isTransfer: isTransfer,
     );
-    // double globalEdgeCost = edgeCostConfig.transitEdgeCostTable.calcCost(fullEdgeTime.total, _distance);
   
     double totalCost = specificEdgeCost;
     return totalCost;
@@ -68,7 +64,14 @@ class VehicleEdge extends TransitEdge {
     if (transitSearchPosition.isFirstEdge) {
       return true;
     }
-    return transitSearchPosition.previousEdge!.edgeTimeEnd <= _timeFromNow;
+    TransitEdge? previousTransitEdge = transitSearchPosition.previousEdge?.transitEdge;
+    bool isTransfer = previousTransitEdge is VehicleEdge && trackId != previousTransitEdge.trackId;
+    int timeFromNow = _timeFromNow;
+    if(isTransfer) {
+      timeFromNow += 4;
+    }
+    
+    return transitSearchPosition.previousEdge!.edgeTimeEnd <= timeFromNow;
   }
   
 

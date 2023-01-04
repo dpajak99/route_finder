@@ -1,0 +1,1 @@
+enum AlgorithmType { dijkstra, aStar, bfs, dfs }
