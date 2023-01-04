@@ -1,5 +1,3 @@
-import 'package:path_finder/bloc/pathfinder_settings_cubit/pathfinder_settings_state.dart';
-import 'package:path_finder/utils/algorithms/haversine.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
@@ -8,16 +6,14 @@ class VehicleEdge extends TransitEdge {
   final String trackId;
   final int _timeFromNow;
   final int _timeToNextStop;
-  final double _distance;
 
-  VehicleEdge({
+  const VehicleEdge({
     required this.trackId,
     required StopVertex sourceVertex,
     required StopVertex targetVertex,
     required int timeFromNow,
     required int timeToNextStop,
-  })  : _distance = Haversine.calcDistanceInMeters(sourceVertex, targetVertex),
-        _timeFromNow = timeFromNow,
+  })  : _timeFromNow = timeFromNow,
         _timeToNextStop = timeToNextStop, 
         super(
           sourceVertex: sourceVertex,

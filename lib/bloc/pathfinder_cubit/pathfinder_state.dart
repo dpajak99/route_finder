@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:path_finder/utils/models/graph/stops_graph.dart';
 
 abstract class PathfinderState extends Equatable {}
 

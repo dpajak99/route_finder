@@ -1,7 +1,6 @@
 import 'package:path_finder/utils/algorithms/haversine.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/edge/walk_edge.dart';
-import 'package:path_finder/utils/models/graph/directed_graph.dart';
 import 'package:path_finder/utils/models/graph/multi_graph.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 

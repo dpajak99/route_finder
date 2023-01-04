@@ -1,5 +1,4 @@
 import 'package:path_finder/utils/models/edge/edge.dart';
-import 'package:path_finder/utils/models/graph/directed_graph.dart';
 import 'package:path_finder/utils/models/vertex/vertex.dart';
 
 class MultiGraph<V extends Vertex, E extends Edge<V>> {

@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_finder/bloc/pathfinder_cubit/pathfinder_cubit.dart';
 import 'package:path_finder/bloc/pathfinder_cubit/pathfinder_state.dart';
 import 'package:path_finder/views/pages/map/graph_map.dart';
-import 'package:path_finder/views/pages/tabs/settings_tab/settings_tab_page.dart';
+import 'package:path_finder/views/pages/tabs/console_tab/console_tab.dart';
+import 'package:path_finder/views/pages/tabs/settings_tab/settings_tab.dart';
 import 'package:path_finder/views/widgets/generic/app_layout.dart';
 
 class MainPage extends StatefulWidget {
@@ -42,12 +43,8 @@ class _MainPageState extends State<MainPage> {
           map: GraphMap(
             mapCubit: pathFinderCubit.mapCubit,
           ),
-          menu: const SettingsTabPage(),
-          terminal: Column(
-            children: const <Widget>[
-              Text('Wybierz przewoźnika'),
-            ],
-          ),
+          menu: const SettingsTab(),
+          console: ConsoleTab(),
         );
       },
     );

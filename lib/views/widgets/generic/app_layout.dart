@@ -4,13 +4,13 @@ class AppLayout extends StatelessWidget {
   final Widget header;
   final Widget map;
   final Widget menu;
-  final Widget terminal;
+  final Widget console;
 
   const AppLayout({
     required this.header,
     required this.map,
     required this.menu,
-    required this.terminal,
+    required this.console,
     super.key,
   });
 
@@ -37,12 +37,11 @@ class AppLayout extends StatelessWidget {
                       Expanded(
                         child: map,
                       ),
-                      // Container(
-                      //   color: const Color.fromARGB(255, 43, 43, 43),
-                      //   height: 200,
-                      //   width: double.infinity,
-                      //   child: terminal,
-                      // ),
+                      SizedBox(
+                        height: 150,
+                        width: double.infinity,
+                        child: console,
+                      ),
                     ],
                   ),
                 ),

@@ -1,5 +1,6 @@
 
 import 'package:get_it/get_it.dart';
+import 'package:path_finder/bloc/console_cubit/console_cubit.dart';
 import 'package:path_finder/bloc/map/map_cubit.dart';
 import 'package:path_finder/bloc/pathfinder_cubit/pathfinder_cubit.dart';
 import 'package:path_finder/bloc/pathfinder_settings_cubit/pathfinder_settings_cubit.dart';
@@ -12,4 +13,5 @@ void initLocator() {
   getIt.registerLazySingleton<PathfinderSettingsCubit>(PathfinderSettingsCubit.new);
   getIt.registerLazySingleton<StopSelectCubit>(StopSelectCubit.new);
   getIt.registerLazySingleton<MapCubit>(MapCubit.new);
+  getIt.registerLazySingleton<ConsoleCubit>(ConsoleCubit.new);
 }

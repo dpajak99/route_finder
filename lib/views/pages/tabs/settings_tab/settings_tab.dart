@@ -14,16 +14,16 @@ import 'package:path_finder/views/widgets/custom/edge_cost_table/vehicle_edge_co
 import 'package:path_finder/views/widgets/custom/edge_cost_table/walk_edge_cost_table_widget/walk_edge_cost_table_widget.dart';
 import 'package:path_finder/views/widgets/generic/tab_layout.dart';
 
-class SettingsTabPage extends StatefulWidget {
-  const SettingsTabPage({
+class SettingsTab extends StatefulWidget {
+  const SettingsTab({
     super.key,
   });
 
   @override
-  State<StatefulWidget> createState() => _SettingsTabPageState();
+  State<StatefulWidget> createState() => _SettingsTabState();
 }
 
-class _SettingsTabPageState extends State<SettingsTabPage> {
+class _SettingsTabState extends State<SettingsTab> {
   final PathfinderSettingsCubit pathfinderSettingsCubit = getIt<PathfinderSettingsCubit>();
   final PathFinderCubit pathFinderCubit = getIt<PathFinderCubit>();
   final StopSelectCubit stopSelectCubit = getIt<StopSelectCubit>();
