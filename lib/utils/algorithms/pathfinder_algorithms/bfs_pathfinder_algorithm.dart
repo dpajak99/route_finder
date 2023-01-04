@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_algoritm_result.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_search_request.dart';
 import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_algorithm.dart';
-import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_algoritm_result.dart';
-import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_search_request.dart';
 import 'package:path_finder/utils/exception/no_route_exception.dart';
 import 'package:path_finder/utils/exception/timeout_exception.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';

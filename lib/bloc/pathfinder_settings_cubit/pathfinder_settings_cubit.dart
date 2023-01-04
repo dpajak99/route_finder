@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_finder/bloc/pathfinder_settings_cubit/pathfinder_settings_state.dart';
-import 'package:path_finder/utils/algorithms/pathfinder_algorithms/algorithm_type.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/algorithm_type.dart';
 import 'package:path_finder/utils/models/edge_cost_table/vehicle_edge_cost_table.dart';
 import 'package:path_finder/utils/models/edge_cost_table/walk_edge_cost_table.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';

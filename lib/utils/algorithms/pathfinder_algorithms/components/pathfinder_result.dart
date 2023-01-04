@@ -1,4 +1,4 @@
-import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_algoritm_result.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_algoritm_result.dart';
 import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
 import 'package:path_finder/utils/models/edge/walk_edge.dart';
 import 'package:path_finder/utils/models/edge_details.dart';

@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:path_finder/bloc/pathfinder_settings_cubit/pathfinder_settings_cubit.dart';
 import 'package:path_finder/config/locator.dart';
-import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_algoritm_result.dart';
-import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_result.dart';
-import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_search_request.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_algoritm_result.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_result.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_search_request.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
 import 'package:path_finder/utils/models/graph/stops_graph.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';

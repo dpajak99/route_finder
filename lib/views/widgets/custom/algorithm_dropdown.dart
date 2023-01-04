@@ -1,6 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:path_finder/utils/algorithms/pathfinder_algorithms/algorithm_type.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/algorithm_type.dart';
 
 class AlgorithmDropdown extends StatefulWidget {
   final ValueChanged<AlgorithmType> onChanged;

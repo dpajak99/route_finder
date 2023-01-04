@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_finder/config/locator.dart';
 import 'package:path_finder/utils/algorithms/pathfinder_algorithms/bfs_pathfinder_algorithm.dart';
-import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_result.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_result.dart';
 import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
 import 'package:path_finder/utils/models/graph/stops_graph.dart';
