@@ -7,7 +7,6 @@ import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 class PathfinderSearchRequest {
   final VehicleEdgeCostTable vehicleEdgeCostTable;
   final WalkEdgeCostTable walkEdgeCostTable;
-  final Duration timeout;
   final MultiGraph<StopVertex, TransitEdge> graph;
   final StopVertex sourceVertex;
   final StopVertex targetVertex;
@@ -16,7 +15,6 @@ class PathfinderSearchRequest {
   PathfinderSearchRequest({
     required this.vehicleEdgeCostTable,
     required this.walkEdgeCostTable,
-    required this.timeout,
     required this.graph,
     required this.sourceVertex,
     required this.targetVertex,

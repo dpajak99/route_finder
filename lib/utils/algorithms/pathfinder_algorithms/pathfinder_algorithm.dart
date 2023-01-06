@@ -10,7 +10,6 @@ import 'package:path_finder/utils/models/graph/multi_graph.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 abstract class PathfinderAlgorithm {
-  static const Duration _timeout = Duration(seconds: 5);
 
   final PathfinderSettingsCubit pathfinderSettingsCubit = getIt<PathfinderSettingsCubit>();
   final MultiGraph<StopVertex, TransitEdge> graph;
@@ -29,7 +28,6 @@ abstract class PathfinderAlgorithm {
     PathfinderSearchRequest pathfinderSearchRequest = PathfinderSearchRequest(
       vehicleEdgeCostTable: pathfinderSettingsCubit.state.vehicleEdgeCostTable,
       walkEdgeCostTable: pathfinderSettingsCubit.state.walkEdgeCostTable,
-      timeout: _timeout,
       graph: graph,
       sourceVertex: sourceVertex,
       targetVertex: targetVertex,

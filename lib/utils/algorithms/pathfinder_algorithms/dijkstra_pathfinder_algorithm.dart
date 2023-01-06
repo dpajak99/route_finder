@@ -22,7 +22,6 @@ class DijkstraPathfinderAlgorithm extends PathfinderAlgorithm {
     MultiGraph<StopVertex, TransitEdge>  graph = pathfinderSearchRequest.graph;
     StopVertex sourceVertex = pathfinderSearchRequest.sourceVertex;
     StopVertex targetVertex = pathfinderSearchRequest.targetVertex;
-    Duration timeout = pathfinderSearchRequest.timeout;
 
     DateTime algorithmStartTime = DateTime.now();
     int visitedStopsCount = 0;
@@ -43,47 +42,34 @@ class DijkstraPathfinderAlgorithm extends PathfinderAlgorithm {
       visitedStops.add(currentVertex);
       visitedStopsCount++;
 
-
-      // Terminate based on timeout. We don't check the termination on every round, as it is
-      // expensive to fetch the current time, compared to just running one more round.
-      // if (visitedStopsCount % 100 == 0 && algorithmStartTime.difference(DateTime.now()).abs() > timeout) {
-      //   throw TimeoutException();
-      // }
-
       if (currentVertex == targetVertex) {
         break;
       }
 
       for (StopVertex neighborVertex in graph[currentVertex].keys) {
-        for (TransitEdge transitEdge in graph[currentVertex][neighborVertex]!) {
-          TransitSearchPosition transitSearchPosition = TransitSearchPosition(
-            walkEdgeCostTable: pathfinderSearchRequest.walkEdgeCostTable,
-            vehicleEdgeCostTable: pathfinderSearchRequest.vehicleEdgeCostTable,
-            totalTimeFromStart: times[currentVertex]!,
-            totalCostFromStart: costs[currentVertex]!,
-            previousEdge: previous[currentVertex],
-          );
+        TransitSearchPosition transitSearchPosition = TransitSearchPosition(
+          walkEdgeCostTable: pathfinderSearchRequest.walkEdgeCostTable,
+          vehicleEdgeCostTable: pathfinderSearchRequest.vehicleEdgeCostTable,
+          totalTimeFromStart: times[currentVertex]!,
+          totalCostFromStart: costs[currentVertex]!,
+          previousEdge: previous[currentVertex],
+        );
 
-          bool isTransitAvailable = transitEdge.canReachEdge(transitSearchPosition);
-          if (isTransitAvailable == false) {
-            continue;
-          }
+        List<TransitEdge> availableEdges = graph[currentVertex][neighborVertex]!;
+        EdgeDetails? lowestEdgeDetails = _calcLowestEdgeCost(availableEdges, transitSearchPosition);
+        if (lowestEdgeDetails == null) {
+          continue;
+        }
+        double newCost = lowestEdgeDetails.costFromStartToReachNeighbor;
+        double previousCost = costs[neighborVertex] ?? double.infinity;
 
-          EdgeDetails edgeDetails = EdgeDetails.calcEdgeDetails(neighborEdge: transitEdge, transitSearchPosition: transitSearchPosition);
-
-          double newTime = edgeDetails.timeFromStartToReachNeighbor;
-          double newCost = edgeDetails.costFromStartToReachNeighbor;
-
-          double previousCost = costs[neighborVertex] ?? double.infinity;
-
-          bool firstNeighborVisit = costs.containsKey(neighborVertex) == false;
-          bool hasBetterCost = newCost < previousCost;
-          if (firstNeighborVisit || hasBetterCost) {
-            costs[neighborVertex] = newCost;
-            times[neighborVertex] = newTime;
-            previous[neighborVertex] = edgeDetails;
-            queue.add(neighborVertex, newCost);
-          }
+        bool firstNeighborVisit = costs.containsKey(neighborVertex) == false;
+        bool hasBetterCost = newCost < previousCost;
+        if (firstNeighborVisit || hasBetterCost) {
+          costs[neighborVertex] = newCost;
+          times[neighborVertex] = lowestEdgeDetails.timeFromStartToReachNeighbor;
+          previous[neighborVertex] = lowestEdgeDetails;
+          queue.add(neighborVertex, newCost);
         }
       }
     }
@@ -100,5 +86,23 @@ class DijkstraPathfinderAlgorithm extends PathfinderAlgorithm {
       times: times,
       visitedStopsHistory: visitedStops,
     );
+  }
+
+  EdgeDetails? _calcLowestEdgeCost(List<TransitEdge> availableEdges, TransitSearchPosition transitSearchPosition) {
+    double lowestCost = double.infinity;
+    EdgeDetails? lowestEdgeDetails;
+    for (TransitEdge transitEdge in availableEdges) {
+      bool isTransitAvailable = transitEdge.canReachEdge(transitSearchPosition);
+      if (isTransitAvailable == false) {
+        continue;
+      }
+      EdgeDetails edgeDetails = EdgeDetails.calcEdgeDetails(neighborEdge: transitEdge, transitSearchPosition: transitSearchPosition);
+      double newCost = edgeDetails.costFromStartToReachNeighbor;
+      if (newCost < lowestCost) {
+        lowestCost = newCost;
+        lowestEdgeDetails = edgeDetails;
+      }
+    }
+    return lowestEdgeDetails;
   }
 }

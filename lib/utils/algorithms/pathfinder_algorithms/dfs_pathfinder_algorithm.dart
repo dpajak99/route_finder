@@ -24,7 +24,6 @@ class DfsPathfinderAlgorithm extends PathfinderAlgorithm {
     MultiGraph<StopVertex, TransitEdge> graph = pathfinderSearchRequest.graph;
     StopVertex sourceVertex = pathfinderSearchRequest.sourceVertex;
     StopVertex targetVertex = pathfinderSearchRequest.targetVertex;
-    Duration timeout = pathfinderSearchRequest.timeout;
 
     DateTime algorithmStartTime = DateTime.now();
     int visitedStopsCount = 0;
@@ -45,12 +44,6 @@ class DfsPathfinderAlgorithm extends PathfinderAlgorithm {
       StopVertex currentVertex = queue.pop();
       visitedStops.add(currentVertex);
       visitedStopsCount++;
-
-      // Terminate based on timeout. We don't check the termination on every round, as it is
-      // expensive to fetch the current time, compared to just running one more round.
-      if (visitedStopsCount % 100 == 0 && algorithmStartTime.difference(DateTime.now()).abs() > timeout) {
-        throw TimeoutException();
-      }
 
       if (currentVertex == targetVertex) {
         break;
