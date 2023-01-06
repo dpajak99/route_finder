@@ -1,15 +1,14 @@
+import 'package:latlong2/latlong.dart';
 import 'package:path_finder/utils/models/vertex/vertex.dart';
 
 class GeoVertex extends Vertex {
-  final double lat;
-  final double long;
+  final LatLng latLng;
 
   const GeoVertex({
-    required this.lat,
-    required this.long,
+    required this.latLng,
     required String id,
   }) : super(id: id);
 
   @override
-  List<Object?> get props => <Object>[id, lat, long];
+  List<Object?> get props => <Object>[id, latLng];
 }

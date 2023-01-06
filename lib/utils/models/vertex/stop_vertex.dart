@@ -1,3 +1,4 @@
+import 'package:latlong2/latlong.dart';
 import 'package:path_finder/utils/models/vertex/geo_vertex.dart';
 
 class StopVertex extends GeoVertex {
@@ -5,11 +6,10 @@ class StopVertex extends GeoVertex {
 
   const StopVertex({
     required this.name,
-    required double lat,
-    required double long,
     required String id,
-  }) : super(lat: lat, long: long, id: id);
+    required LatLng latLng,
+  }) : super(id: id, latLng: latLng);
 
   @override
-  List<Object?> get props => <Object>[id, lat, long, name];
+  List<Object?> get props => <Object>[id, latLng, name];
 }

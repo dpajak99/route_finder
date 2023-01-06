@@ -24,6 +24,16 @@ class StopEntity extends Equatable {
       city: json['city'] as String,
     );
   }
+  
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'name': name,
+      'lat': lat,
+      'lng': lng,
+      'city': city,
+    };
+  }
 
   @override
   List<Object?> get props => <Object>[id, name, lat, lng, city];

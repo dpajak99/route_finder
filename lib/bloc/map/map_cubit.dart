@@ -51,10 +51,7 @@ class MapCubit extends Cubit<void> {
     
     List<Polyline> polylines =  path.map((EdgeDetails e) {
       return Polyline(
-        points: <LatLng>[
-          LatLng(e.transitEdge.sourceVertex.lat, e.transitEdge.sourceVertex.long),
-          LatLng(e.transitEdge.targetVertex.lat, e.transitEdge.targetVertex.long),
-        ],
+        points: <LatLng>[e.transitEdge.sourceVertex.latLng, e.transitEdge.targetVertex.latLng],
         strokeWidth: 5.0,
         color: e.transitEdge is WalkEdge ? Colors.red : Colors.blue,
         isDotted: e.transitEdge is WalkEdge,

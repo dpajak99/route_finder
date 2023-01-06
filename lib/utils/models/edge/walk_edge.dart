@@ -1,3 +1,4 @@
+import 'package:path_finder/infra/entity/walk_edge_entity.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
@@ -13,6 +14,14 @@ class WalkEdge extends TransitEdge {
           sourceVertex: sourceVertex,
           targetVertex: targetVertex,
         );
+  
+  factory WalkEdge.fromEntity(WalkEdgeEntity walkEdgeEntity, StopVertex sourceVertex, StopVertex targetVertex) {
+    return WalkEdge(
+      sourceVertex: sourceVertex,
+      targetVertex: targetVertex,
+      distance: walkEdgeEntity.distance,
+    );
+  }
 
   @override
   double get transitStartTime => double.infinity;

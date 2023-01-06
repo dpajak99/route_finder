@@ -4,21 +4,22 @@ import 'package:path_finder/config/locator.dart';
 import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_algoritm_result.dart';
 import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_result.dart';
 import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_search_request.dart';
+import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
-import 'package:path_finder/utils/models/graph/stops_graph.dart';
+import 'package:path_finder/utils/models/graph/multi_graph.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 abstract class PathfinderAlgorithm {
   static const Duration _timeout = Duration(seconds: 5);
 
   final PathfinderSettingsCubit pathfinderSettingsCubit = getIt<PathfinderSettingsCubit>();
-  final StopsGraph stopsGraph;
+  final MultiGraph<StopVertex, TransitEdge> graph;
   final StopVertex sourceVertex;
   final StopVertex targetVertex;
   final DateTime startTime;
 
   PathfinderAlgorithm({
-    required this.stopsGraph,
+    required this.graph,
     required this.sourceVertex,
     required this.targetVertex,
     required this.startTime,
@@ -29,7 +30,7 @@ abstract class PathfinderAlgorithm {
       vehicleEdgeCostTable: pathfinderSettingsCubit.state.vehicleEdgeCostTable,
       walkEdgeCostTable: pathfinderSettingsCubit.state.walkEdgeCostTable,
       timeout: _timeout,
-      stopsGraph: stopsGraph,
+      graph: graph,
       sourceVertex: sourceVertex,
       targetVertex: targetVertex,
       startTime: startTime,

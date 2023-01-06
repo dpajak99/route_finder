@@ -6,14 +6,14 @@ import 'package:path_finder/utils/exception/no_route_exception.dart';
 import 'package:path_finder/utils/exception/timeout_exception.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
-import 'package:path_finder/utils/models/graph/stops_graph.dart';
+import 'package:path_finder/utils/models/graph/multi_graph.dart';
 import 'package:path_finder/utils/models/queue/stack_queue.dart';
 import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class DfsPathfinderAlgorithm extends PathfinderAlgorithm {
   DfsPathfinderAlgorithm({
-    required super.stopsGraph,
+    required super.graph,
     required super.sourceVertex,
     required super.targetVertex,
     required super.startTime,
@@ -21,7 +21,7 @@ class DfsPathfinderAlgorithm extends PathfinderAlgorithm {
 
   @override
   Future<PathfinderAlgorithmResult> runSearch(PathfinderSearchRequest pathfinderSearchRequest) async {
-    StopsGraph stopsGraph = pathfinderSearchRequest.stopsGraph;
+    MultiGraph<StopVertex, TransitEdge>  graph = pathfinderSearchRequest.graph;
     StopVertex sourceVertex = pathfinderSearchRequest.sourceVertex;
     StopVertex targetVertex = pathfinderSearchRequest.targetVertex;
     Duration timeout = pathfinderSearchRequest.timeout;
@@ -56,8 +56,8 @@ class DfsPathfinderAlgorithm extends PathfinderAlgorithm {
         break;
       }
 
-      for (StopVertex neighborVertex in stopsGraph[currentVertex].keys) {
-        for (TransitEdge transitEdge in stopsGraph[currentVertex][neighborVertex]!) {
+      for (StopVertex neighborVertex in graph[currentVertex].keys) {
+        for (TransitEdge transitEdge in graph[currentVertex][neighborVertex]!) {
           TransitSearchPosition transitSearchPosition = TransitSearchPosition(
             walkEdgeCostTable: pathfinderSearchRequest.walkEdgeCostTable,
             vehicleEdgeCostTable: pathfinderSearchRequest.vehicleEdgeCostTable,

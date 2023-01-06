@@ -1,3 +1,4 @@
+import 'package:path_finder/infra/entity/vehicle_edge_entity.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
@@ -23,6 +24,18 @@ class VehicleEdge extends TransitEdge {
           sourceVertex: sourceVertex,
           targetVertex: targetVertex,
         );
+  
+  factory VehicleEdge.fromEntity(VehicleEdgeEntity vehicleEdgeEntity, StopVertex sourceVertex, StopVertex targetVertex) {
+    return VehicleEdge(
+      sourceVertex: sourceVertex,
+      targetVertex: targetVertex,
+      departureTime: vehicleEdgeEntity.timeInMin,
+      trackId: vehicleEdgeEntity.trackId,
+      busName: vehicleEdgeEntity.busName,
+      timeFromNow: vehicleEdgeEntity.timeInMin,
+      timeToNextStop: vehicleEdgeEntity.timeToNextStop,
+    );
+  }
 
   @override
   double get transitStartTime => _timeFromNow.toDouble();
