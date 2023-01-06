@@ -7,7 +7,7 @@ import 'package:path_finder/utils/exception/timeout_exception.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
 import 'package:path_finder/utils/models/graph/multi_graph.dart';
-import 'package:path_finder/utils/models/queue/priority_queue.dart';
+import 'package:path_finder/utils/models/queue/fifo_queue.dart';
 import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
@@ -34,15 +34,15 @@ class BfsPathfinderAlgorithm extends PathfinderAlgorithm {
     Map<StopVertex, EdgeDetails> previous = <StopVertex, EdgeDetails>{};
 
     List<StopVertex> visitedStops = List<StopVertex>.empty(growable: true);
-    List<TransitEdge> visitedEdges = List<TransitEdge>.empty(growable: true);
+    List<StopVertex> bfsVisitedStops = List<StopVertex>.empty(growable: true);
 
-    PriorityQueue<StopVertex> queue = PriorityQueue<StopVertex>();
-    queue.add(sourceVertex, 0);
+    FifoQueue<StopVertex> queue = FifoQueue<StopVertex>();
+    queue.add(sourceVertex);
     times[sourceVertex] = 0;
     costs[sourceVertex] = 0;
 
     while (queue.isNotEmpty) {
-      StopVertex currentVertex = queue.pop().value;
+      StopVertex currentVertex = queue.pop();
       visitedStops.add(currentVertex);
       visitedStopsCount++;
 
@@ -56,34 +56,28 @@ class BfsPathfinderAlgorithm extends PathfinderAlgorithm {
         break;
       }
       for (StopVertex neighborVertex in graph[currentVertex].keys) {
-        for (TransitEdge transitEdge in graph[currentVertex][neighborVertex]!) {
-          TransitSearchPosition transitSearchPosition = TransitSearchPosition(
-            walkEdgeCostTable: pathfinderSearchRequest.walkEdgeCostTable,
-            vehicleEdgeCostTable: pathfinderSearchRequest.vehicleEdgeCostTable,
-            totalTimeFromStart: times[currentVertex]!,
-            totalCostFromStart: costs[currentVertex]!,
-            previousEdge: previous[currentVertex],
-          );
-
-          bool isTransitAvailable = transitEdge.canReachEdge(transitSearchPosition);
-          if (isTransitAvailable == false) {
-            continue;
-          }
-
-          if (!visitedEdges.contains(transitEdge)) {
-            visitedEdges.add(transitEdge);
-
-            EdgeDetails edgeDetails = EdgeDetails.calcEdgeDetails(neighborEdge: transitEdge, transitSearchPosition: transitSearchPosition);
-
-            double newTime = edgeDetails.timeFromStartToReachNeighbor;
-            double newCost = edgeDetails.costFromStartToReachNeighbor;
-
-            costs[neighborVertex] = newCost;
-            times[neighborVertex] = newTime;
-            previous[neighborVertex] = edgeDetails;
-            queue.add(neighborVertex, newCost);
-          }
+        if (bfsVisitedStops.contains(neighborVertex)) {
+          continue;
         }
+        TransitSearchPosition transitSearchPosition = TransitSearchPosition(
+          walkEdgeCostTable: pathfinderSearchRequest.walkEdgeCostTable,
+          vehicleEdgeCostTable: pathfinderSearchRequest.vehicleEdgeCostTable,
+          totalTimeFromStart: times[currentVertex]!,
+          totalCostFromStart: costs[currentVertex]!,
+          previousEdge: previous[currentVertex],
+        );
+
+        List<TransitEdge> availableEdges = graph[currentVertex][neighborVertex]!;
+        EdgeDetails? lowestEdgeDetails = _calcLowestEdgeCost(availableEdges, transitSearchPosition);
+        if (lowestEdgeDetails == null) {
+          continue;
+        }
+
+        bfsVisitedStops.add(neighborVertex);
+        costs[neighborVertex] = lowestEdgeDetails.costFromStartToReachNeighbor;
+        times[neighborVertex] = lowestEdgeDetails.timeFromStartToReachNeighbor;
+        previous[neighborVertex] = lowestEdgeDetails;
+        queue.add(neighborVertex);
       }
     }
 
@@ -93,10 +87,29 @@ class BfsPathfinderAlgorithm extends PathfinderAlgorithm {
 
     return PathfinderAlgorithmResult(
       algorithmStartTime: algorithmStartTime,
-      algorithmEndTime: DateTime.now(),
       visitedStopsCount: visitedStopsCount,
       previous: previous,
+      costs: costs,
+      times: times,
       visitedStopsHistory: visitedStops,
     );
+  }
+
+  EdgeDetails? _calcLowestEdgeCost(List<TransitEdge> availableEdges, TransitSearchPosition transitSearchPosition) {
+    double lowestCost = double.infinity;
+    EdgeDetails? lowestEdgeDetails;
+    for (TransitEdge transitEdge in availableEdges) {
+      bool isTransitAvailable = transitEdge.canReachEdge(transitSearchPosition);
+      if (isTransitAvailable == false) {
+        continue;
+      }
+      EdgeDetails edgeDetails = EdgeDetails.calcEdgeDetails(neighborEdge: transitEdge, transitSearchPosition: transitSearchPosition);
+      double newCost = edgeDetails.costFromStartToReachNeighbor;
+      if (newCost < lowestCost) {
+        lowestCost = newCost;
+        lowestEdgeDetails = edgeDetails;
+      }
+    }
+    return lowestEdgeDetails;
   }
 }

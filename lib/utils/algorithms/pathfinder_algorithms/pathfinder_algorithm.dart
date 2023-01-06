@@ -37,6 +37,7 @@ abstract class PathfinderAlgorithm {
     );
     PathfinderAlgorithmResult pathfinderAlgorithmResult = await runSearch(pathfinderSearchRequest);
     PathfinderResult pathfinderResult = PathfinderResult(
+      pathfinderSettingsState: pathfinderSettingsCubit.state,
       pathfinderAlgorithmResult: pathfinderAlgorithmResult,
       path: buildPath(pathfinderAlgorithmResult.previous),
       initialTime: startTime,

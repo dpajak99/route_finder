@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:latlong2/latlong.dart';
-import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
+import 'package:latlong2/latlong.dart' as map;
+import 'package:path_finder/utils/models/distance.dart';
 
 class Haversine {
   /// Haversine formula
@@ -9,7 +9,7 @@ class Haversine {
   /// c = 2 ⋅ atan2( √a, √(1−a) )
   /// d = R ⋅ c
   /// Source: https://www.movable-type.co.uk/scripts/latlong.html
-  static double calcDistanceInMeters(LatLng sourceLatLng, LatLng targetLatLng) {
+  static Distance calcDistance(map.LatLng sourceLatLng, map.LatLng targetLatLng) {
     const double earthRadius = 6371e3; // Earth's radius in meters
 
     // Convert latitude and longitude to radians
@@ -28,6 +28,6 @@ class Haversine {
     final double c = 2 * atan2(sqrt(a), sqrt(1 - a));
     final double distance = earthRadius * c;
 
-    return distance;
+    return Distance(meters: distance);
   }
 }

@@ -9,14 +9,6 @@ class StackQueue<T> extends Queue<T> {
     _stack.add(element);
   }
 
-  // Gets the element from the stack (without removing it)
-  T peek() {
-    if (_stack.isEmpty) {
-      throw Exception('Stack is empty');
-    }
-    return _stack.last;
-  }
-
   // Removes and returns the element from the stack
   @override
   T pop() {

@@ -37,8 +37,8 @@ class GraphService {
         case VehicleEdgeEntity:
           VehicleEdgeEntity vehicleEdgeEntity = transitEdgeEntity as VehicleEdgeEntity;
           int timeFromNow = vehicleEdgeEntity.timeInMin - minutes;
-          if( timeFromNow > 0 ) {
-            transitEdgeList.add(VehicleEdge.fromEntity(vehicleEdgeEntity, sourceVertex, targetVertex));
+          if( timeFromNow >= 0 ) {
+            transitEdgeList.add(VehicleEdge.fromEntity(vehicleEdgeEntity, sourceVertex, targetVertex, timeFromNow));
           }
           break;
         case WalkEdgeEntity:

@@ -35,6 +35,7 @@ dependencies:
   flutter_map: ^3.0.0
   flutter_map_marker_popup: ^4.0.0
   flutter_map_marker_cluster: ^1.0.1
+  flutter_map_dragmarker: ^4.1.2
   graphs: ^2.2.0
   postgres: ^2.5.2
   math_parser: ^1.5.0

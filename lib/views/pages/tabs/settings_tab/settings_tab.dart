@@ -10,8 +10,7 @@ import 'package:path_finder/config/locator.dart';
 import 'package:path_finder/views/pages/date_time_select.dart';
 import 'package:path_finder/views/pages/stop_select.dart';
 import 'package:path_finder/views/widgets/custom/algorithm_dropdown.dart';
-import 'package:path_finder/views/widgets/custom/edge_cost_table/vehicle_edge_cost_table_widget/vehicle_edge_cost_table_widget.dart';
-import 'package:path_finder/views/widgets/custom/edge_cost_table/walk_edge_cost_table_widget/walk_edge_cost_table_widget.dart';
+import 'package:path_finder/views/widgets/custom/edge_cost_table/edge_cost_table_widget.dart';
 import 'package:path_finder/views/widgets/generic/tab_layout.dart';
 
 class SettingsTab extends StatefulWidget {
@@ -58,14 +57,21 @@ class _SettingsTabState extends State<SettingsTab> {
                       StopSelect(
                         onTap: () => stopSelectCubit.setActiveSelection(StopActiveSelection.source),
                         onCancel: () => stopSelectCubit.setActiveSelection(StopActiveSelection.none),
+                        onRandom: stopSelectCubit.setRandomSourceVertex,
                         selectedVertex: stopSelectState.sourceVertex,
                         active: stopSelectState.stopActiveSelection == StopActiveSelection.source,
                       ),
-                      const SizedBox(height: 8),
+                      TextButton.icon(
+                        onPressed: stopSelectCubit.reverse,
+                        icon: const Icon(Icons.swap_vert),
+                        label: const Text('Zmień miejscami'),
+                      ),
+                      const SizedBox(height: 16),
                       const Text('Wybierz przystanek końcowy'),
                       StopSelect(
                         onTap: () => stopSelectCubit.setActiveSelection(StopActiveSelection.target),
                         onCancel: () => stopSelectCubit.setActiveSelection(StopActiveSelection.none),
+                        onRandom: stopSelectCubit.setRandomTargetVertex,
                         selectedVertex: stopSelectState.targetVertex,
                         active: stopSelectState.stopActiveSelection == StopActiveSelection.target,
                       ),
@@ -99,11 +105,9 @@ class _SettingsTabState extends State<SettingsTab> {
                 ],
               ),
               const SizedBox(height: 32),
-              const Text('Konfiguracja kar pieszego transferu'),
-              const WalkEdgeCostTableWidget(),
+              const Text('Konfiguracja kar'),
+              const EdgeCostTableWidget(),
               const SizedBox(height: 16),
-              const Text('Konfiguracja kar przejazdu'),
-              const VehicleEdgeCostTableWidget(),
               const SizedBox(height: 16),
             ],
           ),

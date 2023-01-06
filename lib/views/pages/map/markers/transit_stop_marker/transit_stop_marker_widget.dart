@@ -5,6 +5,7 @@ import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
+import 'package:path_finder/utils/time_utils.dart';
 
 class TransitStopMarkerWidget extends StatelessWidget {
   final EdgeDetails edgeDetails;
@@ -89,9 +90,9 @@ class TransitStopMarkerWidget extends StatelessWidget {
                   children: <Widget>[
                     SizedBox(width: double.infinity, child: Text(edgeDetails.cost.toString(), overflow: TextOverflow.ellipsis)),
                     if (edgeDetails.transitEdge is VehicleEdge)
-                      SizedBox(width: double.infinity, child: Text(minutesToString(edgeDetails.departureTime), overflow: TextOverflow.ellipsis)),
-                    SizedBox(width: double.infinity, child: Text(minutesToString(edgeDetails.fullTime.waitingTime), overflow: TextOverflow.ellipsis)),
-                    SizedBox(width: double.infinity, child: Text(minutesToString(time), overflow: TextOverflow.ellipsis)),
+                      SizedBox(width: double.infinity, child: Text(TimeUtils.minutesToString(edgeDetails.departureTime), overflow: TextOverflow.ellipsis)),
+                    SizedBox(width: double.infinity, child: Text(TimeUtils.minutesToString(edgeDetails.fullTime.waitingTime), overflow: TextOverflow.ellipsis)),
+                    SizedBox(width: double.infinity, child: Text(TimeUtils.minutesToString(time), overflow: TextOverflow.ellipsis)),
                   ],
                 ),
               ),
@@ -110,9 +111,5 @@ class TransitStopMarkerWidget extends StatelessWidget {
     }
   }
 
-  String minutesToString(num minutes) {
-    int hours = minutes ~/ 60;
-    int minutesLeft = minutes.toInt() % 60;
-    return '${hours.toString().padLeft(2, '0')}:${minutesLeft.toString().padLeft(2, '0')}';
-  }
+
 }

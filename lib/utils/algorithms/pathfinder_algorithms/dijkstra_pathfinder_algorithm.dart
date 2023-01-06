@@ -94,9 +94,10 @@ class DijkstraPathfinderAlgorithm extends PathfinderAlgorithm {
 
     return PathfinderAlgorithmResult(
       algorithmStartTime: algorithmStartTime,
-      algorithmEndTime: DateTime.now(),
       visitedStopsCount: visitedStopsCount,
       previous: previous,
+      costs: costs,
+      times: times,
       visitedStopsHistory: visitedStops,
     );
   }

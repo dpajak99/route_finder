@@ -31,7 +31,7 @@ class CustomMarkerLayer extends StatelessWidget {
             fitBoundsOptions: const FitBoundsOptions(
               padding: EdgeInsets.all(50),
             ),
-            markers: mapMarkersState.markers,
+            markers: !mapMarkersState.editMode && mapMarkersState.visible ? mapMarkersState.markers : <Marker>[],
             polygonOptions: const PolygonOptions(borderColor: Colors.transparent, color: Colors.transparent, borderStrokeWidth: 1),
             builder: (BuildContext context, List<Marker> markers) {
               return FloatingActionButton(

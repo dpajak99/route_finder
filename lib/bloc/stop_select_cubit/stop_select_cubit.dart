@@ -2,11 +2,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_finder/bloc/console_cubit/console_cubit.dart';
 import 'package:path_finder/bloc/stop_select_cubit/stop_select_state.dart';
 import 'package:path_finder/config/locator.dart';
+import 'package:path_finder/infra/service/stop_service.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class StopSelectCubit extends Cubit<StopSelectState> {
   final ConsoleCubit consoleCubit = getIt<ConsoleCubit>();
-
+  final StopService stopService = getIt<StopService>();
+  
   StopSelectCubit() : super(const StopSelectState(stopActiveSelection: StopActiveSelection.none));
   
   void setActiveSelection(StopActiveSelection stopActiveSelection) {
@@ -43,6 +45,34 @@ class StopSelectCubit extends Cubit<StopSelectState> {
       stopActiveSelection: targetVertex != null ? state.stopActiveSelection : StopActiveSelection.none,
     ));
     _setupConsole();
+  }
+  
+  Future<void> setRandom() async {
+    final StopVertex? sourceVertex = await stopService.getRandomStopVertex();
+    final StopVertex? targetVertex = await stopService.getRandomStopVertex();
+    emit(StopSelectState(
+      sourceVertex: sourceVertex,
+      targetVertex: targetVertex,
+      stopActiveSelection: StopActiveSelection.none,
+    ));
+  }
+  
+  Future<void> setRandomSourceVertex() async {
+    final StopVertex? sourceVertex = await stopService.getRandomStopVertex();
+    setSourceVertex(sourceVertex);
+  }
+  
+  Future<void> setRandomTargetVertex() async {
+    final StopVertex? targetVertex = await stopService.getRandomStopVertex();
+    setTargetVertex(targetVertex);
+  }
+  
+  Future<void> reverse() async {
+    emit(StopSelectState(
+      sourceVertex: state.targetVertex,
+      targetVertex: state.sourceVertex,
+      stopActiveSelection: StopActiveSelection.none,
+    ));
   }
 
   void _setupConsole() {

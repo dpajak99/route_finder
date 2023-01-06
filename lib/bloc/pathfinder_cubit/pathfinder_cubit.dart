@@ -29,6 +29,9 @@ class PathFinderCubit extends Cubit<PathfinderState> {
   }
   
   Future<void> init() async {
+    // run graph initialization to set cached repositories
+    await graphService.getFullTransitsGraph(0);
+    
     consoleCubit.setLines(<String>['Pathfinder v.1.0.0']);
     List<StopVertex> stopVertices = await stopService.getAll();
     mapCubit.setVisibleStops(stopVertices);
@@ -86,21 +89,10 @@ class PathFinderCubit extends Cubit<PathfinderState> {
 
       PathfinderResult pathfinderResult = await pathfinderAlgorithm.searchPath();
       mapCubit.setVisibleSearchResult(pathfinderResult);
-      _setupConsole(pathfinderResult);
+      consoleCubit.setLines(pathfinderResult.logs);
     } catch(e) {
       consoleCubit.setLines(<String>['Error during search: $e']);
       rethrow;
     }
-  }
-  
-  void _setupConsole(PathfinderResult pathfinderResult) {
-    consoleCubit.setLines(<String>[
-      'Pathfinder v.1.0.0',
-      'Algorithm: ${pathfinderSettingsCubit.state.algorithmType}',
-      'Source: ${pathfinderSettingsCubit.state.sourceVertex!.name}',
-      'Target: ${pathfinderSettingsCubit.state.targetVertex!.name}',
-      'Start time: ${pathfinderSettingsCubit.state.searchDateTime}',
-      'Visited stops count: ${pathfinderResult.visitedStopsCount}',
-    ]);
   }
 }

@@ -37,6 +37,7 @@ class VehicleEdgeEntity extends TransitEdgeEntity {
       'bus_name': busName,
       'time_in_min': timeInMin,
       'time_to_next_stop_in_min': timeToNextStop,
+      'type': 'vehicle',
     };
   }
 

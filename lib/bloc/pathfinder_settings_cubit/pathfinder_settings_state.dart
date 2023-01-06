@@ -22,13 +22,12 @@ class PathfinderSettingsState extends Equatable {
   })  : algorithmType = algorithmType ?? AlgorithmType.dijkstra,
         walkEdgeCostTable = walkEdgeCostTable ??
             WalkEdgeCostTable(
-              walkingDistancePenaltyFunction: '5^((1/800)*x) + a',
-              guaranteedPenaltyForTransfer: 10,
+              walkingDistancePenaltyFunction: '(x/100)^2 + a',
+              guaranteedPenaltyForTransfer: 30,
               speed: 50,
-              weight: 1,
             ),
-        vehicleEdgeCostTable = vehicleEdgeCostTable ?? VehicleEdgeCostTable(penaltyForTransfer: 15, penaltyWeight: 1, waitingTimeWeight: 1),
-        searchDateTime = searchDateTime ?? DateTime(2022, 12, 15, 14, 0);
+        vehicleEdgeCostTable = vehicleEdgeCostTable ?? VehicleEdgeCostTable(penaltyForTransfer: 15),
+        searchDateTime = searchDateTime ?? DateTime(2022, 12, 15, 6, 0);
 
   PathfinderSettingsState copyWith({
     AlgorithmType? algorithmType,

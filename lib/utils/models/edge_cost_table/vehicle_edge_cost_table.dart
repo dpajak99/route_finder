@@ -5,13 +5,9 @@ import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class VehicleEdgeCostTable implements EdgeCostTable<StopVertex, VehicleEdge> {
   final double penaltyForTransfer;
-  final double penaltyWeight;
-  final double waitingTimeWeight;
 
   VehicleEdgeCostTable({
     required this.penaltyForTransfer,
-    required this.penaltyWeight,
-    required this.waitingTimeWeight,
   });
 
   VehicleEdgeCostTable copyWith({
@@ -21,8 +17,6 @@ class VehicleEdgeCostTable implements EdgeCostTable<StopVertex, VehicleEdge> {
   }) {
     return VehicleEdgeCostTable(
       penaltyForTransfer: penaltyForTransfer ?? this.penaltyForTransfer,
-      penaltyWeight: penaltyWeight ?? this.penaltyWeight,
-      waitingTimeWeight: waitingTimeWeight ?? this.waitingTimeWeight,
     );
   }
   

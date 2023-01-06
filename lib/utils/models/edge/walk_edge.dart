@@ -1,10 +1,11 @@
 import 'package:path_finder/infra/entity/walk_edge_entity.dart';
+import 'package:path_finder/utils/models/distance.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class WalkEdge extends TransitEdge {
-  final double distance;
+  final Distance distance;
 
   const WalkEdge({
     required StopVertex sourceVertex,
@@ -19,7 +20,7 @@ class WalkEdge extends TransitEdge {
     return WalkEdge(
       sourceVertex: sourceVertex,
       targetVertex: targetVertex,
-      distance: walkEdgeEntity.distance,
+      distance: Distance( meters: walkEdgeEntity.distanceInMeters),
     );
   }
 
@@ -52,10 +53,10 @@ class WalkEdge extends TransitEdge {
     return nextWalkEdgeInLine == false;
   }
 
-  double calcWalkingDistance(int speed) => distance / speed;
+  double calcWalkingDistance(int speed) => distance.inMeters / speed;
 
   @override
   String toString() {
-    return 'WALK: ${sourceVertex.name} -> ${targetVertex.name} (${distance.toStringAsFixed(2)}m)';
+    return 'WALK: ${sourceVertex.name} -> ${targetVertex.name} (${distance})';
   }
 }

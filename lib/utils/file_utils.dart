@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileUtils {
@@ -27,5 +28,14 @@ class FileUtils {
   static Future<String> _getLocalPath() async {
     final Directory directory = await getApplicationDocumentsDirectory();
     return directory.path;
+  }
+  
+  static Future<String> readAssetFile(String filename) async {
+    try {
+      String contents = await rootBundle.loadString('assets/$filename');
+      return contents;
+    } catch (e) {
+      rethrow;
+    }
   }
 }

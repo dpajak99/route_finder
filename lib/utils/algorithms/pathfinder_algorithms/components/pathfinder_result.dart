@@ -1,241 +1,129 @@
+import 'package:path_finder/bloc/pathfinder_settings_cubit/pathfinder_settings_state.dart';
+import 'package:path_finder/utils/algorithms/haversine.dart';
 import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_algoritm_result.dart';
+import 'package:path_finder/utils/models/distance.dart';
 import 'package:path_finder/utils/models/edge/vehicle_edge.dart';
 import 'package:path_finder/utils/models/edge/walk_edge.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
+import 'package:path_finder/utils/time_utils.dart';
 
 class PathfinderResult {
   final DateTime initialTime;
-  final DateTime algorithmStartTime;
-  final DateTime algorithmEndTime;
+  final DateTime searchStartTime;
+  final DateTime searchEndTime;
   final int visitedStopsCount;
   final List<EdgeDetails> path;
   final List<StopVertex> visitedStopsHistory;
+  final PathfinderSettingsState pathfinderSettingsState;
 
   factory PathfinderResult({
     required PathfinderAlgorithmResult pathfinderAlgorithmResult,
     required List<EdgeDetails> path,
     required DateTime initialTime,
+    required PathfinderSettingsState pathfinderSettingsState,
   }) {
     return PathfinderResult._(
       initialTime: initialTime,
-      algorithmStartTime: pathfinderAlgorithmResult.algorithmStartTime,
-      algorithmEndTime: pathfinderAlgorithmResult.algorithmEndTime,
+      searchStartTime: pathfinderAlgorithmResult.algorithmStartTime,
+      searchEndTime: DateTime.now(),
       visitedStopsCount: pathfinderAlgorithmResult.visitedStopsCount,
       path: path,
       visitedStopsHistory: pathfinderAlgorithmResult.visitedStopsHistory,
+      pathfinderSettingsState: pathfinderSettingsState,
     );
   }
 
   PathfinderResult._({
     required this.initialTime,
-    required this.algorithmStartTime,
-    required this.algorithmEndTime,
+    required this.searchStartTime,
+    required this.searchEndTime,
     required this.visitedStopsCount,
     required this.path,
     required this.visitedStopsHistory,
+    required this.pathfinderSettingsState,
   });
 
-  List<PathfinderResultStoryAction> get story {
-    List<PathfinderResultStoryAction> story = <PathfinderResultStoryAction>[];
-    for (int i = 0; i < path.length; i++) {
-      EdgeDetails edgeDetails = path[i];
-      EdgeDetails? previousEdgeDetails = i > 0 ? path[i - 1] : null;
-      EdgeDetails? nextEdgeDetails = i + 1 < path.length ? path[i + 1] : null;
-      int totalTime = edgeDetails.edgeTimeEnd.toInt();
-      DateTime startTime = initialTime.add(Duration(minutes: edgeDetails.edgeTimeStart.toInt()));
-      DateTime arrivalTime = initialTime.add(Duration(minutes: totalTime));
+  List<String> get logs {
+    return <String>[
+      'Pathfinder v.1.0.0',
+      'Algorithm: ${pathfinderSettingsState.algorithmType}',
+      '----',
+      'Source: ${pathfinderSettingsState.sourceVertex!.name}',
+      'Target: ${pathfinderSettingsState.targetVertex!.name}',
+      '----',
+      'Visited stops count: ${visitedStopsCount}',
+      'Total transfers: ${totalTransfersCount}',
+      'Total walks: ${totalWalksCount}',
+      '----',
+      'Total walk distance: ${totalWalkDistance}',
+      'Total trip distance: ${totalTripDistance}',
+      '----',
+      'Trip start time: ${pathfinderSettingsState.searchDateTime}',
+      'Trip end time: ${tripEndTime}',
+      'Trip duration: ${TimeUtils.minutesToString(tripDuration.inMinutes)}',
+      '----',
+      'Search start time: ${searchStartTime}',
+      'Search end time: ${searchEndTime}',
+      'Search duration: ${TimeUtils.millisecondsToString(searchDuration.inMilliseconds)}',
+    ];
+  }
 
-      bool isLast = nextEdgeDetails == null;
-      if (isLast) {
-        story.add(ArrivalAction(targetVertex: edgeDetails.transitEdge.targetVertex, totalTime: totalTime, arrivalTime: arrivalTime));
-        break;
-      }
+  DateTime get tripEndTime {
+    return pathfinderSettingsState.searchDateTime.add(Duration(minutes: path.last.edgeTimeEnd.toInt()));
+  }
 
-      bool isStart = previousEdgeDetails == null;
-      if (isStart) {
-        story.add(StartAction(sourceVertex: edgeDetails.transitEdge.sourceVertex, startTime: initialTime));
-      }
+  Duration get tripDuration {
+    return tripEndTime.difference(pathfinderSettingsState.searchDateTime);
+  }
 
-      bool isWalking = edgeDetails.transitEdge is WalkEdge;
-      if (isWalking) {
-        story.add(WalkAction(
-          sourceVertex: edgeDetails.transitEdge.sourceVertex,
-          targetVertex: edgeDetails.transitEdge.targetVertex,
-          totalTime: totalTime,
-          startTime: startTime,
-          arrivalTime: arrivalTime,
-        ));
-      }
+  Duration get searchDuration {
+    return searchEndTime.difference(searchStartTime);
+  }
 
-      bool isVehicle = edgeDetails.transitEdge is VehicleEdge;
-      if (isVehicle) {
-        VehicleEdge currentVehicleEdge = edgeDetails.transitEdge as VehicleEdge;
-        bool isPreviousVehicle = previousEdgeDetails?.transitEdge is VehicleEdge;
-        if (isPreviousVehicle) {
-          VehicleEdge previousVehicleEdge = previousEdgeDetails!.transitEdge as VehicleEdge;
-          bool isTransit = currentVehicleEdge.trackId != previousVehicleEdge.trackId;
-          if (isTransit) {
-            story.add(LeaveVehicleAction(stopVertex: previousVehicleEdge.targetVertex, leaveTrackId: previousVehicleEdge.trackId));
-          } else {
-            story.add(TripAction(
-              sourceVertex: edgeDetails.transitEdge.sourceVertex,
-              targetVertex: edgeDetails.transitEdge.targetVertex,
-              totalTime: totalTime,
-              startTime: startTime,
-              arrivalTime: arrivalTime,
-              trackId: currentVehicleEdge.trackId,
-            ));
-            continue;
-          }
-        }
-        story.add(WaitAction(
-          stopVertex: edgeDetails.transitEdge.sourceVertex,
-          waitTime: edgeDetails.fullTime.waitingTime.toInt(),
-        ));
-
-        startTime = startTime.add(Duration(minutes: edgeDetails.fullTime.waitingTime.toInt()));
-        story.add(EnterVehicleAction(
-          stopVertex: edgeDetails.transitEdge.sourceVertex,
-          trackId: currentVehicleEdge.trackId,
-          time: startTime,
-        ));
-
-        story.add(TripAction(
-          sourceVertex: edgeDetails.transitEdge.sourceVertex,
-          targetVertex: edgeDetails.transitEdge.targetVertex,
-          totalTime: edgeDetails.fullTime.transitTime.toInt(),
-          startTime: startTime,
-          arrivalTime: arrivalTime,
-          trackId: currentVehicleEdge.trackId,
-        ));
+  int get totalTransfersCount {
+    Set<String> trackIds = <String>{};
+    for (EdgeDetails edgeDetails in path) {
+      if (edgeDetails.transitEdge is VehicleEdge) {
+        VehicleEdge vehicleEdge = edgeDetails.transitEdge as VehicleEdge;
+        trackIds.add(vehicleEdge.trackId);
       }
     }
-    return story;
+    return trackIds.length - 1;
   }
-}
 
-abstract class PathfinderResultStoryAction {}
-
-class StartAction extends PathfinderResultStoryAction {
-  final StopVertex sourceVertex;
-  final DateTime startTime;
-
-  StartAction({
-    required this.sourceVertex,
-    required this.startTime,
-  });
-
-  @override
-  String toString() {
-    return 'StartAction{sourceVertex: ${sourceVertex.name}, startTime: $startTime}';
+  int get totalWalksCount {
+    int walksCount = 0;
+    for (EdgeDetails edgeDetails in path) {
+      if (edgeDetails.transitEdge is WalkEdge) {
+        walksCount++;
+      }
+    }
+    return walksCount;
   }
-}
 
-class ArrivalAction extends PathfinderResultStoryAction {
-  final StopVertex targetVertex;
-  final DateTime arrivalTime;
-  final int totalTime;
-
-  ArrivalAction({
-    required this.targetVertex,
-    required this.arrivalTime,
-    required this.totalTime,
-  });
-
-  @override
-  String toString() {
-    return 'ArrivalAction{targetVertex: ${targetVertex.name}, arrivalTime: $arrivalTime, totalTime: $totalTime}';
+  Distance get totalWalkDistance {
+    Distance distance = Distance.zero;
+    for (EdgeDetails edgeDetails in path) {
+      if (edgeDetails.transitEdge is WalkEdge) {
+        WalkEdge walkEdge = edgeDetails.transitEdge as WalkEdge;
+        distance += walkEdge.distance;
+      }
+    }
+    return distance;
   }
-}
-
-class WalkAction extends PathfinderResultStoryAction {
-  final StopVertex sourceVertex;
-  final StopVertex targetVertex;
-  final DateTime startTime;
-  final DateTime arrivalTime;
-  final int totalTime;
-
-  WalkAction({
-    required this.sourceVertex,
-    required this.targetVertex,
-    required this.startTime,
-    required this.arrivalTime,
-    required this.totalTime,
-  });
-
-  @override
-  String toString() {
-    return 'WalkAction{sourceVertex: ${sourceVertex.name}, targetVertex: ${targetVertex.name}, startTime: $startTime, arrivalTime: $arrivalTime, totalTime: $totalTime}';
-  }
-}
-
-class LeaveVehicleAction extends PathfinderResultStoryAction {
-  final StopVertex stopVertex;
-  final String leaveTrackId;
-
-  LeaveVehicleAction({
-    required this.stopVertex,
-    required this.leaveTrackId,
-  });
-
-  @override
-  String toString() {
-    return 'LeaveVehicleAction{stopVertex: ${stopVertex.name}, leaveTrackId: $leaveTrackId}';
-  }
-}
-
-class TripAction extends PathfinderResultStoryAction {
-  final StopVertex sourceVertex;
-  final StopVertex targetVertex;
-  final DateTime startTime;
-  final DateTime arrivalTime;
-  final int totalTime;
-  final String trackId;
-
-  TripAction({
-    required this.sourceVertex,
-    required this.targetVertex,
-    required this.startTime,
-    required this.arrivalTime,
-    required this.totalTime,
-    required this.trackId,
-  });
-
-  @override
-  String toString() {
-    return 'TripAction{sourceVertex: ${sourceVertex.name}, targetVertex: ${targetVertex.name}, startTime: $startTime, arrivalTime: $arrivalTime, totalTime: $totalTime, trackId: $trackId}';
-  }
-}
-
-class WaitAction extends PathfinderResultStoryAction {
-  final StopVertex stopVertex;
-  final int waitTime;
-
-  WaitAction({
-    required this.stopVertex,
-    required this.waitTime,
-  });
-
-  @override
-  String toString() {
-    return 'WaitAction{stopVertex: ${stopVertex.name}, waitTime: $waitTime}';
-  }
-}
-
-class EnterVehicleAction extends PathfinderResultStoryAction {
-  final StopVertex stopVertex;
-  final String trackId;
-  final DateTime time;
-
-  EnterVehicleAction({
-    required this.stopVertex,
-    required this.trackId,
-    required this.time,
-  });
-
-  @override
-  String toString() {
-    return 'EnterVehicleAction{stopVertex: ${stopVertex.name}, trackId: $trackId, time: $time}';
+  
+  Distance get totalTripDistance {
+    Distance distance = Distance.zero;
+    for (EdgeDetails edgeDetails in path) {
+      if (edgeDetails.transitEdge is WalkEdge) {
+        WalkEdge walkEdge = edgeDetails.transitEdge as WalkEdge;
+        distance += walkEdge.distance;
+      } else {
+        VehicleEdge vehicleEdge = edgeDetails.transitEdge as VehicleEdge;
+        distance += Haversine.calcDistance(vehicleEdge.sourceVertex.latLng, vehicleEdge.targetVertex.latLng);
+      }
+    }
+    return distance;
   }
 }

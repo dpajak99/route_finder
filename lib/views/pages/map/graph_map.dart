@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:path_finder/bloc/map/map_cubit.dart';
+import 'package:path_finder/views/pages/map/layers/custom_draggable_marker_layer.dart';
 import 'package:path_finder/views/pages/map/layers/custom_marker_layer.dart';
 import 'package:path_finder/views/pages/map/layers/custom_polylines_layer.dart';
 
@@ -27,6 +28,7 @@ class GraphMap extends StatelessWidget {
         ),
         CustomPolylineLayer(mapPolylinesCubit: mapCubit.mapPolylinesCubit),
         CustomMarkerLayer(mapMarkersCubit: mapCubit.mapMarkersCubit),
+        CustomDraggableMarkerLayer(mapMarkersCubit: mapCubit.mapMarkersCubit, mapPolylinesCubit: mapCubit.mapPolylinesCubit),
       ],
     );
   }

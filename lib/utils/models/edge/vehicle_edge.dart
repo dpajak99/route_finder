@@ -25,14 +25,14 @@ class VehicleEdge extends TransitEdge {
           targetVertex: targetVertex,
         );
   
-  factory VehicleEdge.fromEntity(VehicleEdgeEntity vehicleEdgeEntity, StopVertex sourceVertex, StopVertex targetVertex) {
+  factory VehicleEdge.fromEntity(VehicleEdgeEntity vehicleEdgeEntity, StopVertex sourceVertex, StopVertex targetVertex, int timeFromNow) {
     return VehicleEdge(
       sourceVertex: sourceVertex,
       targetVertex: targetVertex,
       departureTime: vehicleEdgeEntity.timeInMin,
       trackId: vehicleEdgeEntity.trackId,
       busName: vehicleEdgeEntity.busName,
-      timeFromNow: vehicleEdgeEntity.timeInMin,
+      timeFromNow: timeFromNow,
       timeToNextStop: vehicleEdgeEntity.timeToNextStop,
     );
   }

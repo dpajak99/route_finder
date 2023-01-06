@@ -15,4 +15,10 @@ class StopService {
       name: stopEntity.name,
     )).toList();
   }
+  
+  Future<StopVertex> getRandomStopVertex() async {
+    List<StopVertex> stopVertexList = await getAll();
+    stopVertexList.shuffle();
+    return stopVertexList.first;
+  }
 }

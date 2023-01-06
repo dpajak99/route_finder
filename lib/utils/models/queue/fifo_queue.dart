@@ -7,7 +7,7 @@ class FifoQueue<T> extends Queue<T> {
   /// Add a new item to the queue and ensure the highest priority element
   /// is at the front of the queue.
   void add(T value) {
-    _queue.insert(0, value);
+    _queue.add(value);
   }
   
   /// Return the highest priority element in the queue.

@@ -26,7 +26,7 @@ class MapCubit extends Cubit<void> {
   
   void setVisibleStops(List<StopVertex> stopVertexList) {
     previousAllStopVertices = stopVertexList;
-    List<Marker> markers = stopVertexList.map((StopVertex e) => StopMarker(stopVertex: e)).toList();
+    List<StopMarker> markers = stopVertexList.map((StopVertex e) => StopMarker(stopVertex: e)).toList();
     mapMarkersCubit.setMarkers(markers);
   }  
   void setVisibleSearchResult(PathfinderResult pathfinderResult) {

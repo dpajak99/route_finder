@@ -18,7 +18,7 @@ class CustomPolylineLayer extends StatelessWidget {
       bloc: mapPolylinesCubit,
       builder: (BuildContext context, MapPolylinesState mapPolylinesState) {
         return PolylineLayer(
-          polylines: mapPolylinesState.polylines.toList(),
+          polylines: mapPolylinesState.visible ? mapPolylinesState.polylines.toList() : <Polyline>[],
         );
       },
     );

@@ -20,12 +20,13 @@ class AppLayout extends StatelessWidget {
       body: Column(
         children: <Widget>[
           Container(
+            width: double.infinity,
             decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(color: Colors.black26, width: 1),
               ),
             ),
-            height: 50,
+            height: 70,
             child: header,
           ),
           Expanded(
@@ -38,7 +39,7 @@ class AppLayout extends StatelessWidget {
                         child: map,
                       ),
                       SizedBox(
-                        height: 150,
+                        height: 450,
                         width: double.infinity,
                         child: console,
                       ),
@@ -46,7 +47,7 @@ class AppLayout extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  width: 400,
+                  width: 450,
                   decoration: const BoxDecoration(
                     border: Border(
                       left: BorderSide(color: Colors.black26, width: 1),

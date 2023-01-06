@@ -3,6 +3,7 @@ import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pa
 import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_search_request.dart';
 import 'package:path_finder/utils/algorithms/pathfinder_algorithms/pathfinder_algorithm.dart';
 import 'package:path_finder/utils/exception/no_route_exception.dart';
+import 'package:path_finder/utils/models/distance.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
 import 'package:path_finder/utils/models/graph/multi_graph.dart';
@@ -70,7 +71,7 @@ class AStarPathfinderAlgorithm extends PathfinderAlgorithm {
             continue;
           }
 
-          double heuristicCost = _calcHeuristicCost(neighborVertex, targetVertex) * 0.0001;
+          double heuristicCost = _calcHeuristicCost(neighborVertex, targetVertex).inKilometers * 0.01;
 
           EdgeDetails edgeDetails = EdgeDetails.calcEdgeDetails(
             neighborEdge: transitEdge,
@@ -101,15 +102,16 @@ class AStarPathfinderAlgorithm extends PathfinderAlgorithm {
 
     return PathfinderAlgorithmResult(
       algorithmStartTime: algorithmStartTime,
-      algorithmEndTime: DateTime.now(),
       visitedStopsCount: visitedStopsCount,
       previous: previous,
+      costs: costs,
+      times: times,
       visitedStopsHistory: visitedStops,
     );
   }
   
-  double _calcHeuristicCost(StopVertex sourceVertex, StopVertex targetVertex) {
-    return Haversine.calcDistanceInMeters(sourceVertex.latLng, targetVertex.latLng);
+  Distance _calcHeuristicCost(StopVertex sourceVertex, StopVertex targetVertex) {
+    return Haversine.calcDistance(sourceVertex.latLng, targetVertex.latLng);
   }
 }
 
