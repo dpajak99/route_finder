@@ -31,7 +31,7 @@ class _HeaderTabState extends State<HeaderTab> {
               valueListenable: editModeNotifier,
               builder: (BuildContext context, bool value, _) {
                 return CheckboxListTile(
-                  enabled: true,
+                  enabled: false,
                   controlAffinity: ListTileControlAffinity.leading,
                   value: value,
                   onChanged: (bool? value) {
