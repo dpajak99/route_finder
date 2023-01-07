@@ -45,9 +45,9 @@ class DfsPathfinderAlgorithm extends PathfinderAlgorithm {
       visitedStops.add(currentVertex);
       visitedStopsCount++;
 
-      if (currentVertex == targetVertex) {
-        break;
-      }
+      // if (currentVertex == targetVertex) {
+      //   break;
+      // }
       for (StopVertex neighborVertex in graph[currentVertex].keys) {
         if (bfsVisitedStops.contains(neighborVertex)) {
           continue;

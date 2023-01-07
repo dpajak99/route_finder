@@ -1,22 +1,24 @@
 import 'package:path_finder/infra/entity/transit_edge_entity.dart';
 
 class WalkEdgeEntity extends TransitEdgeEntity {
-  final double distanceInMeters;
-  
   const WalkEdgeEntity({
-    required int from,
-    required int to,
-    required this.distanceInMeters,
+    required String from,
+    required String to,
+    required int distanceInMeters,
+    required List<String> polylines,
   }) : super(
     from: from,
     to: to,
+    distanceInMeters: distanceInMeters,
+    polylines: polylines,
   );
   
   factory WalkEdgeEntity.fromJson(Map<String, dynamic> json) {
     return WalkEdgeEntity(
-      from: json['from'] as int,
-      to: json['to'] as int,
-      distanceInMeters: json['distance'] as double,
+      from: json['from'] as String,
+      to: json['to'] as String,
+      distanceInMeters: json['distance'] as int,
+      polylines: (json['polylines'] as List<dynamic>).map((dynamic e) => e as String).toList(),
     );
   }
   
@@ -25,10 +27,11 @@ class WalkEdgeEntity extends TransitEdgeEntity {
       'from': from,
       'to': to,
       'distance': distanceInMeters,
+      'polylines': polylines,
       'type': 'walk',
     };
   }
 
   @override
-  List<Object?> get props => <Object?>[from, to, distanceInMeters];
+  List<Object?> get props => <Object?>[from, to, distanceInMeters, polylines];
 }

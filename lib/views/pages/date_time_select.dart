@@ -31,36 +31,39 @@ class _DateTimeSelectState extends State<DateTimeSelect> {
         children: <Widget>[
           Expanded(
             flex: 2,
-            child: InkWell(
-              onTap: () async {
-                final DateTime? selectedDate = await showDatePicker(
-                  context: context,
-                  initialDate: dateTime,
-                  firstDate: widget.initialDateTime,
-                  lastDate: DateTime(2024),
-                );
-
-                if (selectedDate != null) {
-                  setState(() {
-                    dateTime = selectedDate;
-                  });
-                  widget.onDateTimeChanged(dateTime);
-                }
-              },
-              customBorder: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black26, width: 1),
+            child: Opacity(
+              opacity: 0.5,
+              child: InkWell(
+                // onTap: () async {
+                //   final DateTime? selectedDate = await showDatePicker(
+                //     context: context,
+                //     initialDate: dateTime,
+                //     firstDate: widget.initialDateTime,
+                //     lastDate: DateTime(2024),
+                //   );
+                //
+                //   if (selectedDate != null) {
+                //     setState(() {
+                //       dateTime = selectedDate;
+                //     });
+                //     widget.onDateTimeChanged(dateTime);
+                //   }
+                // },
+                customBorder: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: ListTile(
-                  minLeadingWidth: 0,
-                  leading: const Icon(Icons.calendar_today, color: Colors.black26),
-                  title: Text(
-                    DateFormat('dd-MM-yyy').format(dateTime),
-                    style: const TextStyle(fontWeight: FontWeight.normal),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black26, width: 1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ListTile(
+                    minLeadingWidth: 0,
+                    leading: const Icon(Icons.calendar_today, color: Colors.black26),
+                    title: Text(
+                      DateFormat('dd-MM-yyy').format(dateTime),
+                      style: const TextStyle(fontWeight: FontWeight.normal),
+                    ),
                   ),
                 ),
               ),

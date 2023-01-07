@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:path_finder/bloc/map/map_markers_cubit/map_markers_cubit.dart';
 import 'package:path_finder/bloc/map/map_polylines_cubit/map_polylines_cubit.dart';
 import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_result.dart';
+import 'package:path_finder/utils/google_coords_utils.dart';
 import 'package:path_finder/utils/models/edge/walk_edge.dart';
 import 'package:path_finder/utils/models/edge_details.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
@@ -50,8 +51,12 @@ class MapCubit extends Cubit<void> {
     }
     
     List<Polyline> polylines =  path.map((EdgeDetails e) {
+      List<LatLng> latLngList = List<LatLng>.empty(growable: true);
+      for( String polyline in e.transitEdge.polylines) {
+        latLngList.addAll(GoogleCoordsUtils.decodePolyline(polyline));
+      }
       return Polyline(
-        points: <LatLng>[e.transitEdge.sourceVertex.latLng, e.transitEdge.targetVertex.latLng],
+        points: latLngList,
         strokeWidth: 5.0,
         color: e.transitEdge is WalkEdge ? Colors.red : Colors.blue,
         isDotted: e.transitEdge is WalkEdge,

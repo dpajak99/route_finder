@@ -22,10 +22,17 @@ class MultiGraph<V extends Vertex, E extends Edge<V>> {
     vehicleEdges.forEach(addEdge);
   }
 
-
   Map<V, List<E>> operator [](V vertex) => adjacencyList[vertex] ?? <V, List<E>>{};
 
   List<V> get keys => adjacencyList.keys.toList();
 
-  // List<E> get values => adjacencyList.values.toList().reduce((List<E> value, List<E> element) => value + element);
+  List<E> get edges {
+    final Set<E> result = <E>{};
+    for (Map<V, List<E>> value in adjacencyList.values) {
+      for (List<E> value in value.values) {
+        result.addAll(value);
+      }
+    }
+    return result.toList();
+  }
 }

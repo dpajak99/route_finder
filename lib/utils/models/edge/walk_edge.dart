@@ -5,22 +5,24 @@ import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
 
 class WalkEdge extends TransitEdge {
-  final Distance distance;
-
-  const WalkEdge({
+  WalkEdge({
     required StopVertex sourceVertex,
     required StopVertex targetVertex,
-    required this.distance,
+    required int distanceInMeters,
+    required List<String> polylines,
   }) : super(
           sourceVertex: sourceVertex,
           targetVertex: targetVertex,
+          distance: Distance(meters: distanceInMeters),
+          polylines: polylines,
         );
-  
+
   factory WalkEdge.fromEntity(WalkEdgeEntity walkEdgeEntity, StopVertex sourceVertex, StopVertex targetVertex) {
     return WalkEdge(
       sourceVertex: sourceVertex,
       targetVertex: targetVertex,
-      distance: Distance( meters: walkEdgeEntity.distanceInMeters),
+      distanceInMeters: walkEdgeEntity.distanceInMeters,
+      polylines: walkEdgeEntity.polylines,
     );
   }
 

@@ -1,4 +1,5 @@
 import 'package:path_finder/infra/entity/vehicle_edge_entity.dart';
+import 'package:path_finder/utils/models/distance.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
@@ -10,7 +11,7 @@ class VehicleEdge extends TransitEdge {
   final int _timeFromNow;
   final int _timeToNextStop;
 
-  const VehicleEdge({
+  VehicleEdge({
     required this.trackId,
     required this.busName,
     required this.departureTime,
@@ -18,13 +19,17 @@ class VehicleEdge extends TransitEdge {
     required StopVertex targetVertex,
     required int timeFromNow,
     required int timeToNextStop,
+    required int distanceInMeters,
+    required List<String> polylines,
   })  : _timeFromNow = timeFromNow,
-        _timeToNextStop = timeToNextStop, 
+        _timeToNextStop = timeToNextStop,
         super(
           sourceVertex: sourceVertex,
           targetVertex: targetVertex,
+          distance: Distance( meters: distanceInMeters),
+          polylines: polylines,
         );
-  
+
   factory VehicleEdge.fromEntity(VehicleEdgeEntity vehicleEdgeEntity, StopVertex sourceVertex, StopVertex targetVertex, int timeFromNow) {
     return VehicleEdge(
       sourceVertex: sourceVertex,
@@ -34,15 +39,17 @@ class VehicleEdge extends TransitEdge {
       busName: vehicleEdgeEntity.busName,
       timeFromNow: timeFromNow,
       timeToNextStop: vehicleEdgeEntity.timeToNextStop,
+      distanceInMeters: vehicleEdgeEntity.distanceInMeters,
+      polylines: vehicleEdgeEntity.polylines,
     );
   }
 
   @override
   double get transitStartTime => _timeFromNow.toDouble();
-  
+
   @override
   FullEdgeTime calcTime(TransitSearchPosition transitSearchPosition) {
-    if( transitSearchPosition.isFirstEdge ) {
+    if (transitSearchPosition.isFirstEdge) {
       return FullEdgeTime(
         waitingTime: _timeFromNow.toDouble(),
         transitTime: _timeToNextStop.toDouble(),
@@ -51,7 +58,7 @@ class VehicleEdge extends TransitEdge {
     double waitingTime = _timeFromNow - transitSearchPosition.totalTimeFromStart;
     return FullEdgeTime(transitTime: _timeToNextStop.toDouble(), waitingTime: waitingTime);
   }
-  
+
   @override
   double calcCost(TransitSearchPosition transitSearchPosition) {
     TransitEdge? previousTransitEdge = transitSearchPosition.previousEdge?.transitEdge;
@@ -63,7 +70,7 @@ class VehicleEdge extends TransitEdge {
       fullEdgeTime: fullEdgeTime,
       isTransfer: isTransfer,
     );
-  
+
     double totalCost = specificEdgeCost;
     return totalCost;
   }
@@ -76,13 +83,12 @@ class VehicleEdge extends TransitEdge {
     TransitEdge? previousTransitEdge = transitSearchPosition.previousEdge?.transitEdge;
     bool isTransfer = previousTransitEdge is VehicleEdge && trackId != previousTransitEdge.trackId;
     int timeFromNow = _timeFromNow;
-    if(isTransfer) {
+    if (isTransfer) {
       timeFromNow += 4;
     }
-    
+
     return transitSearchPosition.previousEdge!.edgeTimeEnd <= timeFromNow;
   }
-  
 
   String getTimeAsString(int time) {
     int fullTimeMinutes = time;
@@ -90,7 +96,7 @@ class VehicleEdge extends TransitEdge {
     int minutes = fullTimeMinutes % 60;
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
   }
-  
+
   @override
   String toString() {
     return 'BUS: From: ${sourceVertex.name}, To: ${targetVertex.name}, Time from now: ${getTimeAsString(_timeFromNow)} Track: $trackId';
@@ -98,5 +104,4 @@ class VehicleEdge extends TransitEdge {
 
   @override
   List<Object?> get props => <Object?>[sourceVertex, targetVertex, trackId, _timeFromNow, _timeToNextStop];
-
 }

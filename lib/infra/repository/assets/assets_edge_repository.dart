@@ -28,7 +28,7 @@ class AssetsEdgeRepository extends EdgeRepository {
       if(edgeMap['type'] == 'walk') {
         return WalkEdgeEntity.fromJson(edgeMap);
       } else if(edgeMap['type'] == 'vehicle') {
-        return VehicleEdgeEntity.fromJson(edgeMap);
+        return VehicleEdgeEntity.fromAssetsJson(edgeMap);
       } else {
         throw Exception('Unknown TransitEdgeEntity type');
       }

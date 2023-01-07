@@ -7,8 +7,10 @@ class VehicleEdgeEntity extends TransitEdgeEntity {
   final int timeToNextStop;
   
   const VehicleEdgeEntity({
-    required int from,
-    required int to,
+    required String from,
+    required String to,
+    required int distanceInMeters,
+    required List<String> polylines,
     required this.trackId,
     required this.busName,
     required this.timeInMin,
@@ -16,16 +18,33 @@ class VehicleEdgeEntity extends TransitEdgeEntity {
   }) : super(
     from: from,
     to: to,
+    distanceInMeters: distanceInMeters,
+    polylines: polylines,
   );
   
-  factory VehicleEdgeEntity.fromJson(Map<String, dynamic> json) {
+  factory VehicleEdgeEntity.fromPostgresJson(Map<String, dynamic> json, int distanceInMeters, String polyline) {
     return VehicleEdgeEntity(
-      from: json['from'] as int,
-      to: json['to'] as int,
+      from: (json['from'] as int).toString(),
+      to: (json['to'] as int).toString(),
       trackId: json['track_id'] as String,
       timeInMin: json['time_in_min'] as int,
       busName: json['bus_name'] as String,
       timeToNextStop: json['time_to_next_stop_in_min'] as int,
+      distanceInMeters: distanceInMeters,
+      polylines: <String>[polyline],
+    );
+  }
+
+  factory VehicleEdgeEntity.fromAssetsJson(Map<String, dynamic> json) {
+    return VehicleEdgeEntity(
+      from: json['from'] as String,
+      to: json['to'] as String,
+      trackId: json['track_id'] as String,
+      timeInMin: json['time_in_min'] as int,
+      busName: json['bus_name'] as String,
+      timeToNextStop: json['time_to_next_stop_in_min'] as int,
+      distanceInMeters: json['distance_in_meters'] as int,
+      polylines: (json['polylines'] as List<dynamic>).map((dynamic e) => e as String).toList(),
     );
   }
   
@@ -33,6 +52,8 @@ class VehicleEdgeEntity extends TransitEdgeEntity {
     return <String, dynamic>{
       'from': from,
       'to': to,
+      'distance_in_meters': distanceInMeters,
+      'polylines': polylines,
       'track_id': trackId,
       'bus_name': busName,
       'time_in_min': timeInMin,
@@ -42,5 +63,5 @@ class VehicleEdgeEntity extends TransitEdgeEntity {
   }
 
   @override
-  List<Object?> get props => <Object?>[from, to, trackId, timeInMin, busName, timeToNextStop];
+  List<Object?> get props => <Object?>[from, to, distanceInMeters, polylines, trackId, timeInMin, busName, timeToNextStop];
 }

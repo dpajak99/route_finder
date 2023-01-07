@@ -27,6 +27,7 @@ dependencies:
   postgres: ^2.5.2
   syncfusion_flutter_charts: ^20.4.42
   vector_math: ^2.1.2
+  dio: ^4.0.6
   
   flutter:
     sdk: flutter
