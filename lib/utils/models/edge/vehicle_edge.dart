@@ -3,17 +3,18 @@ import 'package:path_finder/utils/models/distance.dart';
 import 'package:path_finder/utils/models/edge/transit_edge.dart';
 import 'package:path_finder/utils/models/transit_search_position.dart';
 import 'package:path_finder/utils/models/vertex/stop_vertex.dart';
+import 'package:path_finder/utils/time_utils.dart';
 
 class VehicleEdge extends TransitEdge {
   final String trackId;
-  final String busName;
+  final String name;
   final int departureTime;
   final int _timeFromNow;
   final int _timeToNextStop;
 
   VehicleEdge({
     required this.trackId,
-    required this.busName,
+    required this.name,
     required this.departureTime,
     required StopVertex sourceVertex,
     required StopVertex targetVertex,
@@ -34,11 +35,11 @@ class VehicleEdge extends TransitEdge {
     return VehicleEdge(
       sourceVertex: sourceVertex,
       targetVertex: targetVertex,
-      departureTime: vehicleEdgeEntity.timeInMin,
+      departureTime: vehicleEdgeEntity.departureTimeInMin,
       trackId: vehicleEdgeEntity.trackId,
-      busName: vehicleEdgeEntity.busName,
+      name: vehicleEdgeEntity.busName,
       timeFromNow: timeFromNow,
-      timeToNextStop: vehicleEdgeEntity.timeToNextStop,
+      timeToNextStop: vehicleEdgeEntity.timeToNextStopInMin,
       distanceInMeters: vehicleEdgeEntity.distanceInMeters,
       polylines: vehicleEdgeEntity.polylines,
     );
@@ -48,22 +49,22 @@ class VehicleEdge extends TransitEdge {
   double get transitStartTime => _timeFromNow.toDouble();
 
   @override
-  FullEdgeTime calcTime(TransitSearchPosition transitSearchPosition) {
+  TransitEdgeTime calcTime(AlgorithmSearchState transitSearchPosition) {
     if (transitSearchPosition.isFirstEdge) {
-      return FullEdgeTime(
+      return TransitEdgeTime(
         waitingTime: _timeFromNow.toDouble(),
-        transitTime: _timeToNextStop.toDouble(),
+        transitTime: _timeToNextStop,
       );
     }
     double waitingTime = _timeFromNow - transitSearchPosition.totalTimeFromStart;
-    return FullEdgeTime(transitTime: _timeToNextStop.toDouble(), waitingTime: waitingTime);
+    return TransitEdgeTime(transitTime: _timeToNextStop, waitingTime: waitingTime);
   }
 
   @override
-  double calcCost(TransitSearchPosition transitSearchPosition) {
+  double calcCost(AlgorithmSearchState transitSearchPosition) {
     TransitEdge? previousTransitEdge = transitSearchPosition.previousEdge?.transitEdge;
 
-    FullEdgeTime fullEdgeTime = calcTime(transitSearchPosition);
+    TransitEdgeTime fullEdgeTime = calcTime(transitSearchPosition);
     bool isTransfer = previousTransitEdge is VehicleEdge && trackId != previousTransitEdge.trackId;
 
     double specificEdgeCost = transitSearchPosition.vehicleEdgeCostTable.calcCost(
@@ -76,7 +77,7 @@ class VehicleEdge extends TransitEdge {
   }
 
   @override
-  bool canReachEdge(TransitSearchPosition transitSearchPosition) {
+  bool canReachEdge(AlgorithmSearchState transitSearchPosition) {
     if (transitSearchPosition.isFirstEdge) {
       return true;
     }
@@ -89,17 +90,10 @@ class VehicleEdge extends TransitEdge {
 
     return transitSearchPosition.previousEdge!.edgeTimeEnd <= timeFromNow;
   }
-
-  String getTimeAsString(int time) {
-    int fullTimeMinutes = time;
-    int hours = fullTimeMinutes ~/ 60;
-    int minutes = fullTimeMinutes % 60;
-    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
-  }
-
+  
   @override
   String toString() {
-    return 'BUS: From: ${sourceVertex.name}, To: ${targetVertex.name}, Time from now: ${getTimeAsString(_timeFromNow)} Track: $trackId';
+    return 'BUS: From: ${sourceVertex.name}, To: ${targetVertex.name}, Time from now: ${TimeUtils.minutesToString(_timeFromNow)} Track: $trackId';
   }
 
   @override

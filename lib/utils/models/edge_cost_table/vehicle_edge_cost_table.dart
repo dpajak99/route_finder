@@ -20,7 +20,7 @@ class VehicleEdgeCostTable implements EdgeCostTable<StopVertex, VehicleEdge> {
     );
   }
   
-  double calcCost({required FullEdgeTime fullEdgeTime, required bool isTransfer}) {
+  double calcCost({required TransitEdgeTime fullEdgeTime, required bool isTransfer}) {
     double timeCost = fullEdgeTime.total;
     double transferPenalty = isTransfer ? penaltyForTransfer : 0;
     return timeCost + transferPenalty;

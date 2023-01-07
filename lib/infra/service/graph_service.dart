@@ -36,7 +36,7 @@ class GraphService {
       switch(transitEdgeEntity.runtimeType) {
         case VehicleEdgeEntity:
           VehicleEdgeEntity vehicleEdgeEntity = transitEdgeEntity as VehicleEdgeEntity;
-          int timeFromNow = vehicleEdgeEntity.timeInMin - minutes;
+          int timeFromNow = vehicleEdgeEntity.departureTimeInMin - minutes;
           if( timeFromNow >= 0 ) {
             transitEdgeList.add(VehicleEdge.fromEntity(vehicleEdgeEntity, sourceVertex, targetVertex, timeFromNow));
           }

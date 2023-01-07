@@ -38,16 +38,16 @@ void main() {
   graph.addVertexIterable(<StopVertex>[vertex1, vertex2, vertex3, vertex4, vertex5, vertex6, vertex7, vertex8, vertex9, vertex10, vertex11]);
   // @formatter:on
 
-  graph.addEdge(VehicleEdge(sourceVertex: vertex1, targetVertex: vertex2, trackId: '1', busName: '1', timeFromNow: 1, timeToNextStop: 1, departureTime: 1));
-  graph.addEdge(VehicleEdge(sourceVertex: vertex1, targetVertex: vertex3, trackId: '1', busName: '1', timeFromNow: 1, timeToNextStop: 1, departureTime: 1));
-  graph.addEdge(VehicleEdge(sourceVertex: vertex2, targetVertex: vertex4, trackId: '1', busName: '1', timeFromNow: 2, timeToNextStop: 1, departureTime: 2));
-  graph.addEdge(VehicleEdge(sourceVertex: vertex2, targetVertex: vertex5, trackId: '1', busName: '1', timeFromNow: 1, timeToNextStop: 1, departureTime: 1));
-  graph.addEdge(VehicleEdge(sourceVertex: vertex3, targetVertex: vertex6, trackId: '1', busName: '1', timeFromNow: 2, timeToNextStop: 1, departureTime: 2));
-  graph.addEdge(VehicleEdge(sourceVertex: vertex4, targetVertex: vertex7, trackId: '1', busName: '1', timeFromNow: 3, timeToNextStop: 1, departureTime: 3));
-  graph.addEdge(VehicleEdge(sourceVertex: vertex4, targetVertex: vertex8, trackId: '1', busName: '1', timeFromNow: 3, timeToNextStop: 1, departureTime: 3));
-  graph.addEdge(VehicleEdge(sourceVertex: vertex5, targetVertex: vertex9, trackId: '1', busName: '1', timeFromNow: 3, timeToNextStop: 1, departureTime: 3));
-  graph.addEdge(VehicleEdge(sourceVertex: vertex5, targetVertex: vertex10, trackId: '1', busName: '1', timeFromNow: 3, timeToNextStop: 1, departureTime: 3));
-  graph.addEdge(VehicleEdge(sourceVertex: vertex6, targetVertex: vertex11, trackId: '1', busName: '1', timeFromNow: 3, timeToNextStop: 1, departureTime: 3));
+  graph.addEdge(VehicleEdge(sourceVertex: vertex1, targetVertex: vertex2, trackId: '1', name: '1', timeFromNow: 1, timeToNextStop: 1, departureTime: 1));
+  graph.addEdge(VehicleEdge(sourceVertex: vertex1, targetVertex: vertex3, trackId: '1', name: '1', timeFromNow: 1, timeToNextStop: 1, departureTime: 1));
+  graph.addEdge(VehicleEdge(sourceVertex: vertex2, targetVertex: vertex4, trackId: '1', name: '1', timeFromNow: 2, timeToNextStop: 1, departureTime: 2));
+  graph.addEdge(VehicleEdge(sourceVertex: vertex2, targetVertex: vertex5, trackId: '1', name: '1', timeFromNow: 1, timeToNextStop: 1, departureTime: 1));
+  graph.addEdge(VehicleEdge(sourceVertex: vertex3, targetVertex: vertex6, trackId: '1', name: '1', timeFromNow: 2, timeToNextStop: 1, departureTime: 2));
+  graph.addEdge(VehicleEdge(sourceVertex: vertex4, targetVertex: vertex7, trackId: '1', name: '1', timeFromNow: 3, timeToNextStop: 1, departureTime: 3));
+  graph.addEdge(VehicleEdge(sourceVertex: vertex4, targetVertex: vertex8, trackId: '1', name: '1', timeFromNow: 3, timeToNextStop: 1, departureTime: 3));
+  graph.addEdge(VehicleEdge(sourceVertex: vertex5, targetVertex: vertex9, trackId: '1', name: '1', timeFromNow: 3, timeToNextStop: 1, departureTime: 3));
+  graph.addEdge(VehicleEdge(sourceVertex: vertex5, targetVertex: vertex10, trackId: '1', name: '1', timeFromNow: 3, timeToNextStop: 1, departureTime: 3));
+  graph.addEdge(VehicleEdge(sourceVertex: vertex6, targetVertex: vertex11, trackId: '1', name: '1', timeFromNow: 3, timeToNextStop: 1, departureTime: 3));
 
   test('', () async {
     DfsPathfinderAlgorithm dfs = DfsPathfinderAlgorithm(graph: graph, sourceVertex: vertex1, targetVertex: vertex7, startTime: DateTime(2023));

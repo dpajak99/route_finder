@@ -17,7 +17,7 @@ class WalkEdgeEntity extends TransitEdgeEntity {
     return WalkEdgeEntity(
       from: json['from'] as String,
       to: json['to'] as String,
-      distanceInMeters: json['distance'] as int,
+      distanceInMeters: json['distance_in_meters'] as int,
       polylines: (json['polylines'] as List<dynamic>).map((dynamic e) => e as String).toList(),
     );
   }
@@ -26,7 +26,7 @@ class WalkEdgeEntity extends TransitEdgeEntity {
     return <String, dynamic>{
       'from': from,
       'to': to,
-      'distance': distanceInMeters,
+      'distance_in_meters': distanceInMeters,
       'polylines': polylines,
       'type': 'walk',
     };

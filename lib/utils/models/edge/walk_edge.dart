@@ -30,16 +30,16 @@ class WalkEdge extends TransitEdge {
   double get transitStartTime => double.infinity;
 
   @override
-  FullEdgeTime calcTime(TransitSearchPosition transitSearchPosition) {
-    return FullEdgeTime(
+  TransitEdgeTime calcTime(AlgorithmSearchState transitSearchPosition) {
+    return TransitEdgeTime(
       waitingTime: 3,
-      transitTime: calcWalkingDistance(transitSearchPosition.walkEdgeCostTable.speed),
+      transitTime: calcWalkingTime(transitSearchPosition.walkEdgeCostTable.speed),
     );
   }
 
   @override
-  double calcCost(TransitSearchPosition transitSearchPosition) {
-    FullEdgeTime fullEdgeTime = calcTime(transitSearchPosition);
+  double calcCost(AlgorithmSearchState transitSearchPosition) {
+    TransitEdgeTime fullEdgeTime = calcTime(transitSearchPosition);
 
     double specificEdgeCost = transitSearchPosition.walkEdgeCostTable.calcCost(distance, fullEdgeTime.total);
 
@@ -47,7 +47,7 @@ class WalkEdge extends TransitEdge {
   }
 
   @override
-  bool canReachEdge(TransitSearchPosition transitSearchPosition) {
+  bool canReachEdge(AlgorithmSearchState transitSearchPosition) {
     if (transitSearchPosition.isFirstEdge) {
       return true;
     }
@@ -55,7 +55,7 @@ class WalkEdge extends TransitEdge {
     return nextWalkEdgeInLine == false;
   }
 
-  double calcWalkingDistance(int speed) => distance.inMeters / speed;
+  int calcWalkingTime(int speed) => distance.inMeters ~/ speed;
 
   @override
   String toString() {

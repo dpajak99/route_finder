@@ -29,7 +29,7 @@ class PostgresEdgeRepository extends EdgeRepository {
   Future<List<TransitEdgeEntity>> getAll() async {
     List<StopEntity> stops = await stopRepository.getAll();
     List<Map<String, Map<String, dynamic>>> result = await sql.mappedResultsQuery(
-      'select bl.name as "bus_name", d.time_in_min, d.time_to_next_stop_in_min, d.track_id, d.bus_stop_id as "from", d.next_stop_id as "to" from schedule.departures d join schedule.tracks t on t.id = d.track_id join schedule.routes r on r.id = t.route_id join schedule.bus_lines bl on bl.id = r.bus_line_id where d.next_stop_id is not null and bl.id NOT IN(152,164,165,166) and t.day_types like\'%RO%\'',
+      'select bl.name as "name", d.time_in_min as "departure_time_in_min", d.time_to_next_stop_in_min as "time_to_next_stop_in_min", d.track_id, d.bus_stop_id as "from", d.next_stop_id as "to" from schedule.departures d join schedule.tracks t on t.id = d.track_id join schedule.routes r on r.id = t.route_id join schedule.bus_lines bl on bl.id = r.bus_line_id where d.next_stop_id is not null and bl.id NOT IN(152,164,165,166) and t.day_types like\'%RO%\'',
     );
 
     List<WalkEdgeEntity> walkEdgesEntityList = await _getWalkEdges();

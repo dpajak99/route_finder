@@ -35,7 +35,7 @@ class AssetsEdgeRepository extends EdgeRepository {
     }).toList();
     
     cachedEdges = transitEdgesEntity;
-    
+    print('ALL EDGES COUNT: ${transitEdgesEntity.length}');
     return transitEdgesEntity;
   }
 }

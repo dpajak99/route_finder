@@ -4,9 +4,9 @@ import 'package:path_finder/utils/models/transit_search_position.dart';
 
 class EdgeDetails {
   final TransitEdge transitEdge;
-  final TransitSearchPosition transitSearchPosition;
+  final AlgorithmSearchState transitSearchPosition;
   final double cost;
-  final FullEdgeTime fullTime;
+  final TransitEdgeTime fullTime;
   final double timeFromStartToReachNeighbor;
   final double costFromStartToReachNeighbor;
 
@@ -21,11 +21,11 @@ class EdgeDetails {
   
   factory EdgeDetails.calcEdgeDetails({
     required TransitEdge neighborEdge,
-    required TransitSearchPosition transitSearchPosition,
+    required AlgorithmSearchState transitSearchPosition,
     double heuristicCost = 0,
   }) {
     double cost = neighborEdge.calcCost(transitSearchPosition) + heuristicCost;
-    FullEdgeTime fullTime = neighborEdge.calcTime(transitSearchPosition);
+    TransitEdgeTime fullTime = neighborEdge.calcTime(transitSearchPosition);
     
     return EdgeDetails._(
       transitEdge: neighborEdge,

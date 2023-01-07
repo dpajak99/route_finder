@@ -20,20 +20,20 @@ abstract class TransitEdge extends Edge<StopVertex> {
   
   double get transitStartTime;
 
-  FullEdgeTime calcTime(TransitSearchPosition transitSearchPosition);
+  TransitEdgeTime calcTime(AlgorithmSearchState transitSearchPosition);
   
-  double calcCost(TransitSearchPosition transitSearchPosition);
+  double calcCost(AlgorithmSearchState transitSearchPosition);
 
-  bool canReachEdge(TransitSearchPosition transitSearchPosition);
+  bool canReachEdge(AlgorithmSearchState transitSearchPosition);
 }
 
-class FullEdgeTime {
+class TransitEdgeTime {
   final double waitingTime;
-  final double transitTime;
+  final int transitTime;
 
   double get total => waitingTime + transitTime;
 
-  FullEdgeTime({
+  TransitEdgeTime({
     required this.waitingTime,
     required this.transitTime,
   });

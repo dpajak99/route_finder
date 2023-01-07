@@ -52,7 +52,7 @@ class DfsPathfinderAlgorithm extends PathfinderAlgorithm {
         if (bfsVisitedStops.contains(neighborVertex)) {
           continue;
         }
-        TransitSearchPosition transitSearchPosition = TransitSearchPosition(
+        AlgorithmSearchState transitSearchPosition = AlgorithmSearchState(
           walkEdgeCostTable: pathfinderSearchRequest.walkEdgeCostTable,
           vehicleEdgeCostTable: pathfinderSearchRequest.vehicleEdgeCostTable,
           totalTimeFromStart: times[currentVertex]!,
@@ -88,7 +88,7 @@ class DfsPathfinderAlgorithm extends PathfinderAlgorithm {
     );
   }
 
-  EdgeDetails? _calcLowestEdgeCost(List<TransitEdge> availableEdges, TransitSearchPosition transitSearchPosition) {
+  EdgeDetails? _calcLowestEdgeCost(List<TransitEdge> availableEdges, AlgorithmSearchState transitSearchPosition) {
     double lowestCost = double.infinity;
     EdgeDetails? lowestEdgeDetails;
     for (TransitEdge transitEdge in availableEdges) {

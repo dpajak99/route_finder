@@ -9,6 +9,7 @@ class StopService {
   
   Future<List<StopVertex>> getAll() async {
     List<StopEntity> stopEntityList = await stopRepository.getAll();
+    print('STOPS LENGTH: ${stopEntityList.length}');
     return stopEntityList.map((StopEntity stopEntity) => StopVertex(
       id: stopEntity.id.toString(),
       latLng: LatLng(stopEntity.lat, stopEntity.lng),

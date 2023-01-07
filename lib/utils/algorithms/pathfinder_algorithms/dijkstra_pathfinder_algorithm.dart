@@ -47,7 +47,7 @@ class DijkstraPathfinderAlgorithm extends PathfinderAlgorithm {
       }
 
       for (StopVertex neighborVertex in graph[currentVertex].keys) {
-        TransitSearchPosition transitSearchPosition = TransitSearchPosition(
+        AlgorithmSearchState transitSearchPosition = AlgorithmSearchState(
           walkEdgeCostTable: pathfinderSearchRequest.walkEdgeCostTable,
           vehicleEdgeCostTable: pathfinderSearchRequest.vehicleEdgeCostTable,
           totalTimeFromStart: times[currentVertex]!,
@@ -88,7 +88,7 @@ class DijkstraPathfinderAlgorithm extends PathfinderAlgorithm {
     );
   }
 
-  EdgeDetails? _calcLowestEdgeCost(List<TransitEdge> availableEdges, TransitSearchPosition transitSearchPosition) {
+  EdgeDetails? _calcLowestEdgeCost(List<TransitEdge> availableEdges, AlgorithmSearchState transitSearchPosition) {
     double lowestCost = double.infinity;
     EdgeDetails? lowestEdgeDetails;
     for (TransitEdge transitEdge in availableEdges) {

@@ -45,7 +45,7 @@ class TransitStopMarkerWidget extends StatelessWidget {
                   ),
                   if (edgeDetails.transitEdge is VehicleEdge)
                     Text(
-                      (edgeDetails.transitEdge as VehicleEdge).busName,
+                      (edgeDetails.transitEdge as VehicleEdge).name,
                       style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                 ],
