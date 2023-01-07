@@ -25,9 +25,9 @@ void initLocator() {
   getIt.registerLazySingleton<MapCubit>(MapCubit.new);
   getIt.registerLazySingleton<ConsoleCubit>(ConsoleCubit.new);
   
-  getIt.registerLazySingleton<StopRepository>(PostgresStopRepository.new);
+  getIt.registerLazySingleton<StopRepository>(AssetsStopRepository.new);
   getIt.registerLazySingleton<StopService>(StopService.new);
-  getIt.registerLazySingleton<EdgeRepository>(PostgresEdgeRepository.new);
+  getIt.registerLazySingleton<EdgeRepository>(AssetsEdgeRepository.new);
   getIt.registerLazySingleton<GraphService>(GraphService.new);
   getIt.registerLazySingleton<GoogleRepository>(AssetsGoogleRepository.new);
 }

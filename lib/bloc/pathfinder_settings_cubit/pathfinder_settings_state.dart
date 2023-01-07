@@ -22,7 +22,7 @@ class PathfinderSettingsState extends Equatable {
   })  : algorithmType = algorithmType ?? AlgorithmType.dijkstra,
         walkEdgeCostTable = walkEdgeCostTable ??
             WalkEdgeCostTable(
-              walkingDistancePenaltyFunction: '(x/20)^1.6 + a',
+              walkingDistancePenaltyFunction: '(x/100)^2 + a',
               guaranteedPenaltyForTransfer: 30,
               speed: 50,
             ),
