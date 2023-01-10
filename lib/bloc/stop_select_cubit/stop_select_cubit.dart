@@ -14,6 +14,16 @@ class StopSelectCubit extends Cubit<StopSelectState> {
   void setActiveSelection(StopActiveSelection stopActiveSelection) {
     emit(state.copyWith(stopActiveSelection: stopActiveSelection));
   }
+  
+  Future<void> setActiveSelectionById(String id) async {
+    try {
+      StopVertex stopVertex = (await stopService.getAll()).firstWhere((StopVertex stopVertex) => stopVertex.id == id);
+      updateSelectedVertex(stopVertex);
+      print('Selected stop: ${stopVertex.name}');
+    } catch (e) {
+      print('Stop with id $id not found');
+    }
+  }
 
   void updateSelectedVertex(StopVertex stopVertex) {
     switch (state.stopActiveSelection) {

@@ -51,7 +51,7 @@ class ConsoleTab extends StatelessWidget {
                   return ListView.builder(
                     itemCount: state.consoleLines.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return Text(
+                      return SelectableText(
                         '> ${state.consoleLines[index]}',
                         style: const TextStyle(
                           fontFamily: 'FiraCode',

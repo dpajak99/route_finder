@@ -20,7 +20,7 @@ class AStarPathfinderAlgorithm extends PathfinderAlgorithm {
   });
 
   @override
-  Future<PathfinderAlgorithmResult> runSearch(PathfinderSearchRequest pathfinderSearchRequest) async {
+  Future<PathfinderAlgorithmResult> runSearch(PathfinderSearchRequest pathfinderSearchRequest, {bool stopWhetTarget = true}) async {
     MultiGraph<StopVertex, TransitEdge> graph = pathfinderSearchRequest.graph;
     StopVertex sourceVertex = pathfinderSearchRequest.sourceVertex;
     StopVertex targetVertex = pathfinderSearchRequest.targetVertex;
@@ -44,7 +44,7 @@ class AStarPathfinderAlgorithm extends PathfinderAlgorithm {
       visitedStops.add(currentVertex);
       visitedStopsCount++;
 
-      if (currentVertex == targetVertex) {
+      if (stopWhetTarget && currentVertex == targetVertex) {
         break;
       }
 
@@ -64,7 +64,7 @@ class AStarPathfinderAlgorithm extends PathfinderAlgorithm {
         }
         double newCost = lowestEdgeDetails.costFromStartToReachNeighbor;
         double previousCost = costs[neighborVertex] ?? double.infinity;
-
+        
         bool firstNeighborVisit = costs.containsKey(neighborVertex) == false;
         bool hasBetterCost = newCost < previousCost;
         if (firstNeighborVisit || hasBetterCost) {
@@ -98,10 +98,13 @@ class AStarPathfinderAlgorithm extends PathfinderAlgorithm {
       if (isTransitAvailable == false) {
         continue;
       }
-      double heuristicCost = _calcHeuristicCost(neighborVertex, targetVertex).inKilometers * 0.01;
+      double heuristicCost = _calcHeuristicCost(neighborVertex, targetVertex).inKilometers * 0.1;
 
-      EdgeDetails edgeDetails =
-          EdgeDetails.calcEdgeDetails(neighborEdge: transitEdge, transitSearchPosition: transitSearchPosition, heuristicCost: heuristicCost);
+      EdgeDetails edgeDetails = EdgeDetails.calcEdgeDetails(
+        neighborEdge: transitEdge,
+        transitSearchPosition: transitSearchPosition,
+        heuristicCost: heuristicCost,
+      );
 
       double newCost = edgeDetails.costFromStartToReachNeighbor;
       if (newCost < lowestCost) {

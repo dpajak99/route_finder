@@ -20,7 +20,7 @@ class BfsPathfinderAlgorithm extends PathfinderAlgorithm {
   });
 
   @override
-  Future<PathfinderAlgorithmResult> runSearch(PathfinderSearchRequest pathfinderSearchRequest) async {
+  Future<PathfinderAlgorithmResult> runSearch(PathfinderSearchRequest pathfinderSearchRequest, {bool stopWhetTarget = true}) async {
     MultiGraph<StopVertex, TransitEdge> graph = pathfinderSearchRequest.graph;
     StopVertex sourceVertex = pathfinderSearchRequest.sourceVertex;
     StopVertex targetVertex = pathfinderSearchRequest.targetVertex;
@@ -45,7 +45,7 @@ class BfsPathfinderAlgorithm extends PathfinderAlgorithm {
       visitedStops.add(currentVertex);
       visitedStopsCount++;
 
-      if (currentVertex == targetVertex) {
+      if (stopWhetTarget && currentVertex == targetVertex) {
         break;
       }
       for (StopVertex neighborVertex in graph[currentVertex].keys) {
@@ -65,6 +65,7 @@ class BfsPathfinderAlgorithm extends PathfinderAlgorithm {
         if (lowestEdgeDetails == null) {
           continue;
         }
+
 
         bfsVisitedStops.add(neighborVertex);
         costs[neighborVertex] = lowestEdgeDetails.costFromStartToReachNeighbor;

@@ -26,6 +26,33 @@ class GraphService {
     return graph;
   }
 
+  Future<MultiGraph<StopVertex, TransitEdge>> getFullTransitsGraphByLines(int minutes, List<String> lines) async {
+    MultiGraph<StopVertex, TransitEdge> graph = MultiGraph<StopVertex, TransitEdge>();
+    List<StopVertex> stopVertexList = await stopService.getAll();
+    List<TransitEdge> transitEdgeList = await _getEdgesList(stopVertexList, minutes);
+    
+    List<TransitEdge> finalTransitEdgeList = <TransitEdge>[];
+    Set<StopVertex> finalStopVertexList = <StopVertex>{};
+    for(TransitEdge transitEdge in transitEdgeList ) {
+      if( transitEdge is VehicleEdge && lines.contains(transitEdge.name) ) {
+        finalTransitEdgeList.add(transitEdge);
+        finalStopVertexList.add(transitEdge.sourceVertex);
+        finalStopVertexList.add(transitEdge.targetVertex);
+      }
+    }
+    
+    for(TransitEdge transitEdge in transitEdgeList ) {
+      if(transitEdge is WalkEdge && finalStopVertexList.contains(transitEdge.sourceVertex) && finalStopVertexList.contains(transitEdge.targetVertex)) {
+        finalTransitEdgeList.add(transitEdge);
+      }
+    }
+
+    graph.addVertexIterable(finalStopVertexList);
+    graph.addEdgeIterable(finalTransitEdgeList);
+
+    return graph;
+  }
+
   Future<List<TransitEdge>> _getEdgesList(List<StopVertex> stopVertexList, int minutes) async {
     List<TransitEdgeEntity> edgesEntityList = await edgeRepository.getAll();
     List<TransitEdge> transitEdgeList = List<TransitEdge>.empty(growable: true);

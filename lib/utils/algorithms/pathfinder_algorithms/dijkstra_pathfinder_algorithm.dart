@@ -18,7 +18,7 @@ class DijkstraPathfinderAlgorithm extends PathfinderAlgorithm {
   });
 
   @override
-  Future<PathfinderAlgorithmResult> runSearch(PathfinderSearchRequest pathfinderSearchRequest) async {
+  Future<PathfinderAlgorithmResult> runSearch(PathfinderSearchRequest pathfinderSearchRequest, {bool stopWhetTarget = true}) async {
     MultiGraph<StopVertex, TransitEdge>  graph = pathfinderSearchRequest.graph;
     StopVertex sourceVertex = pathfinderSearchRequest.sourceVertex;
     StopVertex targetVertex = pathfinderSearchRequest.targetVertex;
@@ -42,7 +42,7 @@ class DijkstraPathfinderAlgorithm extends PathfinderAlgorithm {
       visitedStops.add(currentVertex);
       visitedStopsCount++;
 
-      if (currentVertex == targetVertex) {
+      if (stopWhetTarget && currentVertex == targetVertex) {
         break;
       }
 
@@ -62,7 +62,7 @@ class DijkstraPathfinderAlgorithm extends PathfinderAlgorithm {
         }
         double newCost = lowestEdgeDetails.costFromStartToReachNeighbor;
         double previousCost = costs[neighborVertex] ?? double.infinity;
-
+        
         bool firstNeighborVisit = costs.containsKey(neighborVertex) == false;
         bool hasBetterCost = newCost < previousCost;
         if (firstNeighborVisit || hasBetterCost) {

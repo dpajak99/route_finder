@@ -1,4 +1,6 @@
-class Distance {
+import 'package:equatable/equatable.dart';
+
+class Distance extends Equatable {
   static Distance zero = Distance(meters: 0);
   final double distanceInMeters;
 
@@ -24,7 +26,7 @@ class Distance {
     return Distance._(distanceInMeters: totalDistance);
   }
   
-  Distance._({
+  const Distance._({
     required this.distanceInMeters,
   });
   
@@ -64,4 +66,7 @@ class Distance {
       return '${inMillimeters.toStringAsFixed(2)} mm';
     }
   }
+  
+  @override
+  List<Object?> get props => <Object>[distanceInMeters];
 }

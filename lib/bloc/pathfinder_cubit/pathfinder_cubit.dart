@@ -40,6 +40,7 @@ class PathFinderCubit extends Cubit<PathfinderState> {
   }
   
   Future<void> search() async {
+    DateTime now = DateTime.now();
     if(pathfinderSettingsCubit.state.filled == false ) {
       print('App not ready to search');
       return;
@@ -87,11 +88,13 @@ class PathFinderCubit extends Cubit<PathfinderState> {
           throw Exception('Algorithm not implemented');
       }
 
+      DateTime now2 = DateTime.now();
+      print('Time to get graph: ${now2.difference(now).inMilliseconds} ms');
       PathfinderResult pathfinderResult = await pathfinderAlgorithm.searchPath();
       mapCubit.setVisibleSearchResult(pathfinderResult);
       consoleCubit.setLines(pathfinderResult.logs);
     } catch(e) {
-      consoleCubit.setLines(<String>['Error during search: $e']);
+      consoleCubit.setLines(<String>['Error during search: ${e.runtimeType}']);
       rethrow;
     }
   }

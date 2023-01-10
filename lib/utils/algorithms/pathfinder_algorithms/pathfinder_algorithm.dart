@@ -24,7 +24,7 @@ abstract class PathfinderAlgorithm {
     required this.startTime,
   });
 
-  Future<PathfinderResult> searchPath() async {
+  Future<PathfinderResult> searchPath({bool stopWhetTarget = true}) async {
     PathfinderSearchRequest pathfinderSearchRequest = PathfinderSearchRequest(
       vehicleEdgeCostTable: pathfinderSettingsCubit.state.vehicleEdgeCostTable,
       walkEdgeCostTable: pathfinderSettingsCubit.state.walkEdgeCostTable,
@@ -33,7 +33,7 @@ abstract class PathfinderAlgorithm {
       targetVertex: targetVertex,
       startTime: startTime,
     );
-    PathfinderAlgorithmResult pathfinderAlgorithmResult = await runSearch(pathfinderSearchRequest);
+    PathfinderAlgorithmResult pathfinderAlgorithmResult = await runSearch(pathfinderSearchRequest, stopWhetTarget: stopWhetTarget);
     PathfinderResult pathfinderResult = PathfinderResult(
       pathfinderSettingsState: pathfinderSettingsCubit.state,
       pathfinderAlgorithmResult: pathfinderAlgorithmResult,
@@ -44,7 +44,7 @@ abstract class PathfinderAlgorithm {
   }
 
   @protected
-  Future<PathfinderAlgorithmResult> runSearch(PathfinderSearchRequest pathfinderSearchRequest);
+  Future<PathfinderAlgorithmResult> runSearch(PathfinderSearchRequest pathfinderSearchRequest, {bool stopWhetTarget = true});
   
   @protected
   List<EdgeDetails> buildPath(Map<StopVertex, EdgeDetails> previous) {

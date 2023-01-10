@@ -39,7 +39,7 @@ class AppLayout extends StatelessWidget {
                         child: map,
                       ),
                       SizedBox(
-                        height: 450,
+                        height: 500,
                         width: double.infinity,
                         child: console,
                       ),

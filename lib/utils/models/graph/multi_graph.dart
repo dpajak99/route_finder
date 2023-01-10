@@ -35,4 +35,10 @@ class MultiGraph<V extends Vertex, E extends Edge<V>> {
     }
     return result.toList();
   }
+
+  V get randomVertex {
+    List<V> vertices = keys;
+    vertices.shuffle();
+    return vertices.first;
+  }
 }

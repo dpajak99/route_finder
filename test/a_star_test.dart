@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:path_finder/config/locator.dart';
+import 'package:path_finder/utils/algorithms/pathfinder_algorithms/a_star_pathfinder_algorithm.dart';
 import 'package:path_finder/utils/algorithms/pathfinder_algorithms/bfs_pathfinder_algorithm.dart';
 import 'package:path_finder/utils/algorithms/pathfinder_algorithms/components/pathfinder_result.dart';
 import 'package:path_finder/utils/algorithms/pathfinder_algorithms/dfs_pathfinder_algorithm.dart';
@@ -26,12 +27,12 @@ void main() {
 
 
   test('', () async {
-    DijkstraPathfinderAlgorithm dijkstra = DijkstraPathfinderAlgorithm(graph: graph, sourceVertex: vertexA, targetVertex: vertexZ, startTime: DateTime(2023));
+    AStarPathfinderAlgorithm aStar = AStarPathfinderAlgorithm(graph: graph, sourceVertex: vertexA, targetVertex: vertexZ, startTime: DateTime(2023));
 
-    PathfinderResult pathSearchResult = await dijkstra.searchPath(stopWhetTarget: true);
+    PathfinderResult pathSearchResult = await aStar.searchPath(stopWhetTarget: true);
 
     print('-------------------');
-    print('Dijkstra Test');
+    print('A* Test raport');
     print('-------------------');
     print('Visited edges history:');
     print(pathSearchResult.visitedStopsHistory.map((StopVertex e) => e.name));

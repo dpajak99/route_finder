@@ -57,6 +57,7 @@ class _SettingsTabState extends State<SettingsTab> {
                       StopSelect(
                         onTap: () => stopSelectCubit.setActiveSelection(StopActiveSelection.source),
                         onCancel: () => stopSelectCubit.setActiveSelection(StopActiveSelection.none),
+                        onText: stopSelectCubit.setActiveSelectionById,
                         onRandom: stopSelectCubit.setRandomSourceVertex,
                         selectedVertex: stopSelectState.sourceVertex,
                         active: stopSelectState.stopActiveSelection == StopActiveSelection.source,
@@ -71,6 +72,7 @@ class _SettingsTabState extends State<SettingsTab> {
                       StopSelect(
                         onTap: () => stopSelectCubit.setActiveSelection(StopActiveSelection.target),
                         onCancel: () => stopSelectCubit.setActiveSelection(StopActiveSelection.none),
+                        onText: stopSelectCubit.setActiveSelectionById,
                         onRandom: stopSelectCubit.setRandomTargetVertex,
                         selectedVertex: stopSelectState.targetVertex,
                         active: stopSelectState.stopActiveSelection == StopActiveSelection.target,

@@ -5,6 +5,7 @@ class StopSelect extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onCancel;
   final VoidCallback onRandom;
+  final ValueChanged<String> onText;
   final StopVertex? selectedVertex;
   final bool active;
 
@@ -12,6 +13,7 @@ class StopSelect extends StatelessWidget {
     required this.onTap,
     required this.onCancel,
     required this.onRandom,
+    required this.onText,
     this.selectedVertex,
     this.active = false,
     Key? key,
@@ -20,6 +22,10 @@ class StopSelect extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
+    final TextEditingController textEditingController = TextEditingController(
+      text: selectedVertex?.id,
+    );
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: <Widget>[
@@ -59,7 +65,26 @@ class StopSelect extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text('ID: ${selectedVertex!.id}'),
+                        Row(
+                          children: <Widget>[
+                            const Text('ID: '),
+                            Expanded(
+                              child: Text(
+                                textEditingController.text,
+                                style: const TextStyle(
+                                  color: Colors.black54,
+                                ),
+                                // controller: textEditingController,
+                                // focusNode: FocusNode(),
+                                // cursorColor: Colors.transparent,
+                                // backgroundCursorColor: Colors.transparent,
+                                // onChanged: (_) {
+                                //   onText(textEditingController.text);
+                                // },
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                       if (selectedVertex == null)
                         const Text(

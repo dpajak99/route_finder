@@ -5,7 +5,7 @@ import 'package:path_finder/views/pages/main/main_page.dart';
 
 Future<void> main() async {
   initLocator();
-  await postgresDatabase.initConnection();
+  // await postgresDatabase.initConnection();
   runApp(const MyApp());
 }
 
