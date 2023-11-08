@@ -1,0 +1,51 @@
+name: path_finder
+description: A new Flutter project.
+publish_to: 'none' 
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.18.5 <3.0.0'
+
+dependencies:
+  cupertino_icons: ^1.0.5
+  dropdown_button2: ^1.9.2
+  equatable: ^2.0.5
+  flutter_bloc: ^8.1.1
+  flutter_map: ^3.1.0
+  flutter_map_dragmarker: ^4.1.2
+  flutter_map_marker_cluster: ^1.0.1
+  flutter_map_marker_popup: ^4.0.0
+  flutter_svg: ^1.1.6
+  get_it: ^7.2.0
+  graphs: ^2.2.0
+  intl: ^0.17.0
+  jdenticon_dart: ^2.0.0
+  latlong2: ^0.8.1
+  math_parser: ^1.5.0
+  path_provider: ^2.0.11
+  postgres: ^2.5.2
+  syncfusion_flutter_charts: ^20.4.42
+  vector_math: ^2.1.2
+  dio: ^4.0.6
+  
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_lints: ^2.0.1
+  
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/fonts/
+  fonts:
+    - family: FiraCode
+      fonts:
+        - asset: assets/fonts/FiraCode-Regular.ttf
+          weight: 400
+
