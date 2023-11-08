@@ -1,16 +1,11 @@
-# path_finder
+# 🎓 Route Finder - Engineering project developed as part of a diploma thesis (2023)
+![Showcase](./img/video.gif)
 
-A new Flutter project.
+## Description
+The program was created to analyze algorithms for finding public transport connections, it allows to search for a route between any two stops from a pool of available stops. As a result of its operation, a search report will be returned, containing the route found, the number of stops visited, the number of transfers, the number of sections required to walk, the length of these sections and the length of the entire route, the time of the route found and the time of the search
+## Technologies
+This project was developed using Flutter. Algorithms analyzed include: Dijkstra, A* (A star), BFS, DFS.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+*This project is published solely for archival purposes.*

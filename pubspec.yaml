@@ -13,7 +13,7 @@ dependencies:
   equatable: ^2.0.5
   flutter_bloc: ^8.1.1
   flutter_map: ^3.1.0
-  flutter_map_dragmarker: ^4.1.2
+  flutter_map_dragmarker: 4.1.2
   flutter_map_marker_cluster: ^1.0.1
   flutter_map_marker_popup: ^4.0.0
   flutter_svg: ^1.1.6
